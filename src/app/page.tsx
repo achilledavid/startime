@@ -1,5 +1,7 @@
 export default function Home() {
   return (
-    <p>hello world!</p>
+    <div className="p-4">
+      <p>Welcome to startime!</p>
+    </div>
   );
 }
