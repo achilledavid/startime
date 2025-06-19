@@ -1,0 +1,29 @@
+import { organization, useActiveOrganization } from "@/lib/auth-client";
+import { invitation } from "@/db/schema";
+
+export type Organization = NonNullable<ReturnType<typeof useActiveOrganization>["data"]>;
+export type Invitations = Array<typeof invitation.$inferSelect>;
+
+export async function createOrganization({ name }: { name: string }) {
+    const slug = name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+
+    try {
+        const response = await organization.create({ name, slug });
+
+        if (response.error) throw new Error(response.error.message);
+
+        return response;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export async function sendInvitation({ email }: { email: string }) {
+    return await organization.inviteMember({
+        email,
+        role: "member"
+    })
+}

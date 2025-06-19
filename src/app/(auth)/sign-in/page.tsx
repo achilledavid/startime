@@ -12,7 +12,7 @@ import { Fragment } from "react"
 
 const formSchema = z.object({
   email: z.string().email(),
-  password: z.string()
+  password: z.string().min(8, "8 chars. min").max(128, "128 chars. max"),
 })
 
 export default function SignIn() {
@@ -30,7 +30,8 @@ export default function SignIn() {
       callbackURL: "/account"
     }, {
       onError: (data) => {
-        form.setError("email", { message: data.error.message })
+        form.setError("email", {});
+        form.setError("password", { message: data.error.message });
       }
     });
   }
@@ -66,6 +67,7 @@ export default function SignIn() {
             )}
           />
           <Button type="submit">Submit</Button>
+          <FormMessage />
         </form>
       </Form>
       <Button variant="secondary" asChild>
