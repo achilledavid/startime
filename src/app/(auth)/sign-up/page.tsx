@@ -9,11 +9,12 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { signUp } from "@/lib/auth-client"
 import { Fragment } from "react"
+import { redirect } from "next/navigation"
 
 const formSchema = z.object({
+  name: z.string(),
   email: z.string().email(),
-  password: z.string().min(8, "8 chars. min").max(128, "128 chars. max"),
-  name: z.string()
+  password: z.string().min(8, "8 chars. min").max(128, "128 chars. max")
 })
 
 export default function SignUp() {
@@ -32,9 +33,11 @@ export default function SignUp() {
       callbackURL: "/account"
     }, {
       onError: (data) => {
-        form.setError("name", { message: data.error.message })
+        form.setError("name", {});
+        form.setError("email", {});
+        form.setError("password", { message: data.error.message });
       }
-    });
+    }).then((response) => { if (response.data?.user) redirect("/account") });
   }
 
   return (

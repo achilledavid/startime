@@ -10,7 +10,7 @@ export default function SignOut() {
   }
 
   return (
-    <Button onClick={handleSignOut} variant="destructive">
+    <Button className="w-fit" onClick={handleSignOut} variant="destructive">
       Sign out
     </Button>
   )
