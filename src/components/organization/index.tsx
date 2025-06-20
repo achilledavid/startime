@@ -7,7 +7,6 @@ import OrganizationMembers from "./members"
 import UserInvitations from "./user-invitations"
 import OrganizationAdministration from "./administration"
 import { User } from "@/lib/session"
-import Link from "next/link"
 import { notFound } from "next/navigation"
 import { trpc } from "@/app/_trpc/client"
 
@@ -23,7 +22,7 @@ export default function Organization({ user, slug }: { user?: User, slug: string
             {data ? (
                 <Fragment>
                     <div>
-                        <Link href={`/${data.organization.slug}`} className="font-semibold hover:underline">{data.organization.name}</Link>
+                        <p className="font-semibold">{data.organization.name}</p>
                         <OrganizationMembers organization={data} />
                     </div>
                     <OrganizationAdministration organization={data} user={user} />

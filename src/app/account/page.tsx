@@ -1,7 +1,7 @@
 import SignOut from "@/components/auth/sign-out";
 import Header from "@/components/header";
 import { authenticate } from "@/lib/session";
-import MyOrganization from "./my-ogranization";
+import MyOrganization from "./my-organization";
 
 export default async function Account() {
   const session = await authenticate()
@@ -11,7 +11,7 @@ export default async function Account() {
     <Header />
     <main className="p-4 flex flex-col gap-4">
       <p>Hello {session.user.name}!</p>
-      <MyOrganization user={session.user} />
+      <MyOrganization />
       <SignOut />
     </main>
     </>
