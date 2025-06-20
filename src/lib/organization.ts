@@ -1,7 +1,6 @@
-import { organization, useActiveOrganization } from "@/lib/auth-client";
+import { organization } from "@/lib/auth-client";
 import { invitation } from "@/db/schema";
 
-export type Organization = NonNullable<ReturnType<typeof useActiveOrganization>["data"]>;
 export type Invitations = Array<typeof invitation.$inferSelect>;
 
 export async function createOrganization({ name }: { name: string }) {
