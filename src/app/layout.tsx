@@ -2,7 +2,6 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { PropsWithChildren } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
-import Header from "@/components/header";
 import Providers from "./_trpc/providers";
 
 const geistSans = Geist({
@@ -24,7 +23,6 @@ export default function RootLayout({ children }: PropsWithChildren) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>
-          <Header />
           {children}
         </Providers>
       </body>
