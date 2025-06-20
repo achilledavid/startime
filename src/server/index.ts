@@ -4,7 +4,7 @@ import { organizationRouter } from "@/routers/organization";
 
 export const appRouter = router({
     invitations: invitationsRouter,
-    organization: organizationRouter
+    organization: organizationRouter,
 })
 
 export type AppRouter = typeof appRouter
