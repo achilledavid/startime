@@ -6,9 +6,9 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
-import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
 import { ChevronDown, LogOut, Settings, User } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
+import { Avatar, AvatarFallback } from "../ui/avatar";
 
 export default function UserItem() {
   const { data: session, isPending } = useSession();

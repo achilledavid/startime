@@ -1,3 +1,5 @@
+"use client"
+
 import {
   Home,
   Users,
@@ -26,7 +28,8 @@ import {
   Mail,
   BookOpen,
   MessageSquare,
-  LucideIcon
+  LucideIcon,
+  Loader2
 } from "lucide-react"
 
 
@@ -47,6 +50,7 @@ import CollapsibleMenuItem from "./collapsible-menu-item"
 import NormalMenuItem from "./normal-menu-item"
 import Link from "next/link"
 import UserItem from "./user-item"
+import { useActiveMember, useActiveOrganization } from "@/lib/auth-client"
 
 export interface MenuItem {
   title: string
@@ -65,19 +69,19 @@ const menuItems: MenuItem[] = [
   {
     title: "Utilisateurs",
     icon: Users,
-    requiredRoles: ["admin", "hr"],
+    requiredRoles: ["owner"],
     items: [
       {
         title: "Liste des utilisateurs",
         url: "/users",
         icon: Users,
-        requiredRoles: ["admin", "hr"],
+        requiredRoles: ["owner"],
       },
       {
         title: "Ajouter un utilisateur",
         url: "/users/add",
         icon: UserPlus,
-        requiredRoles: ["admin", "hr"],
+        requiredRoles: ["owner"],
       },
     ],
   },
@@ -94,50 +98,50 @@ const menuItems: MenuItem[] = [
         title: "Mes parcours",
         url: "/onboarding/list",
         icon: FolderOpen,
-        requiredRoles: ["admin", "hr", "manager"],
+        requiredRoles: ["owner"],
       },
       {
         title: "Créer un parcours",
         url: "/admin/onboarding/edit",
         icon: Edit,
-        requiredRoles: ["admin", "hr"],
+        requiredRoles: ["owner"],
       },
       {
         title: "Mode test",
         url: "/onboarding/preview",
         icon: Eye,
-        requiredRoles: ["admin", "hr"],
+        requiredRoles: ["owner"],
       },
       {
         title: "Mon parcours",
         url: "/onboarding",
         icon: BookOpen,
-        requiredRoles: ["employee"],
+        requiredRoles: ["member"],
       },
     ],
   },
   {
     title: "Suivi & automatisation",
     icon: BarChart3,
-    requiredRoles: ["admin", "hr"],
+    requiredRoles: ["owner"],
     items: [
       {
         title: "Tableau de bord",
         url: "/analytics",
         icon: BarChart3,
-        requiredRoles: ["admin", "hr"],
+        requiredRoles: ["owner"],
       },
       {
         title: "Automatisations",
         url: "/automations",
         icon: Zap,
-        requiredRoles: ["admin", "hr"],
+        requiredRoles: ["owner"],
       },
       {
         title: "Historique",
         url: "/history",
         icon: Archive,
-        requiredRoles: ["admin", "hr"],
+        requiredRoles: ["owner"],
       },
     ],
   },
@@ -175,7 +179,7 @@ const menuItems: MenuItem[] = [
         title: "Import / Upload",
         url: "/documents/upload",
         icon: Upload,
-        requiredRoles: ["admin", "hr"],
+        requiredRoles: ["owner"],
       },
     ],
   },
@@ -192,69 +196,88 @@ const menuItems: MenuItem[] = [
   {
     title: "Intégrations",
     icon: Plug,
-    requiredRoles: ["admin"],
+    requiredRoles: ["owner"],
     items: [
       {
         title: "Intégrations externes",
         url: "/integrations",
         icon: Plug,
-        requiredRoles: ["admin"],
+        requiredRoles: ["owner"],
       },
     ],
   },
   {
     title: "Personnalisation",
     icon: Palette,
-    requiredRoles: ["admin", "hr"],
+    requiredRoles: ["owner"],
     items: [
       {
         title: "Thèmes graphiques",
         url: "/customization/themes",
         icon: Palette,
-        requiredRoles: ["admin", "hr"],
+        requiredRoles: ["owner"],
       },
       {
         title: "Branding",
         url: "/customization/branding",
         icon: Building,
-        requiredRoles: ["admin", "hr"],
+        requiredRoles: ["owner"],
       },
       {
         title: "Culture d'entreprise",
         url: "/customization/culture",
         icon: Lightbulb,
-        requiredRoles: ["admin", "hr"],
+        requiredRoles: ["owner"],
       },
     ],
   },
   {
     title: "Paramètres",
     icon: Settings,
-    requiredRoles: ["admin"],
+    requiredRoles: ["owner"],
     items: [
       {
         title: "Gestion des droits",
         url: "/settings/permissions",
         icon: Shield,
-        requiredRoles: ["admin"],
+        requiredRoles: ["owner"],
       },
       {
         title: "Templates de mails",
         url: "/settings/templates",
         icon: Mail,
-        requiredRoles: ["admin"],
+        requiredRoles: ["owner"],
       },
       {
         title: "Paramètres généraux",
         url: "/settings/general",
         icon: Settings,
-        requiredRoles: ["admin"],
+        requiredRoles: ["owner"],
       },
     ],
   },
 ]
 
 export function AppSidebar() {
+  const { data: organization } = useActiveOrganization()
+  const { data: member } = useActiveMember()
+
+  const filteredMenuItems = menuItems.filter((item) => {
+    if (!member) return false;
+
+    if (item.items) {
+      item.items = item.items.filter(subItem => {
+        if (!subItem.requiredRoles) return true;
+
+        return subItem.requiredRoles.some(role => member.role === role);
+      });
+    }
+
+    if (!item.requiredRoles) return true;
+
+    return item.requiredRoles.some(role => member.role === role);
+  });
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -267,7 +290,7 @@ export function AppSidebar() {
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-semibold">Startime</span>
-                  <span className="text-xs">Entreprise</span>
+                  <span className="text-xs text-muted-foreground">{organization?.name ?? <Loader2 className="size-4 animate-spin text-muted-foreground" />}</span>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -278,21 +301,30 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  {item.items ? (
-                    <CollapsibleMenuItem
-                      item={item}
-                    />
-                  ) : (
-                    <NormalMenuItem
-                      item={item}
-                    />
-                  )}
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+            {
+              organization ? (
+                <SidebarMenu>
+                  {filteredMenuItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      {item.items ? (
+                        <CollapsibleMenuItem
+                          item={item}
+                        />
+                      ) : (
+                        <NormalMenuItem
+                          item={item}
+                        />
+                      )}
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              ) : (
+                <div className="flex h-full w-full items-center justify-center">
+                  <Loader2 className="size-6 animate-spin text-muted-foreground" />
+                </div>
+              )
+            }
+
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

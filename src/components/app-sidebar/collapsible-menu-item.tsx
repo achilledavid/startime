@@ -12,7 +12,7 @@ export default function CollapsibleMenuItem({
   return (
     <Collapsible className="group/collapsible">
       <CollapsibleTrigger asChild>
-        <SidebarMenuButton>
+        <SidebarMenuButton className="cursor-pointer">
           <item.icon />
           <span>{item.title}</span>
           <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
