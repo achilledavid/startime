@@ -11,7 +11,7 @@ export default async function Account() {
     <Header />
     <main className="p-4 flex flex-col gap-4">
       <p>Hello {session.user.name}!</p>
-      <MyOrganization />
+      <MyOrganization user={session.user} />
       <SignOut />
     </main>
     </>
