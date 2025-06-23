@@ -39,7 +39,13 @@ export default function SignIn() {
   return (
     <Fragment>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-xl">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6 p-10 w-2xl">
+            <div className="flex flex-col items-center gap-2 text-center">
+            <h1 className="text-2xl font-bold">Welcome</h1>
+            <p className="text-muted-foreground text-sm text-balance">
+              Login to your account to your Startime account
+            </p>
+          </div>
           <FormField
             control={form.control}
             name="email"
