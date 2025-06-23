@@ -9,4 +9,6 @@ const client = createAuthClient({
   ],
 })
 
+export type { User, Session } from "better-auth/types";
+
 export const { signIn, signOut, signUp, useSession, organization, useActiveOrganization, useListOrganizations, useActiveMember } = client;

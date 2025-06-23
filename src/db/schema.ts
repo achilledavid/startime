@@ -1,4 +1,5 @@
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, pgEnum, json, integer, check } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const user = pgTable("user", {
 	id: text('id').primaryKey(),
@@ -73,3 +74,35 @@ export const invitation = pgTable("invitation", {
 	expiresAt: timestamp('expires_at').notNull(),
 	inviterId: text('inviter_id').notNull().references(() => user.id, { onDelete: 'cascade' })
 });
+
+export const onboarding = pgTable("onboarding", {
+	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+	organizationId: text('organization_id').notNull().references(() => organization.id, { onDelete: 'cascade' }),
+	title: text('title').notNull(),
+	description: text('description').notNull(),
+});
+
+export const stepsTypes = pgEnum('steps_types', ['document', 'video', 'checklist']);
+
+export const checklist = pgTable("checklist", {
+	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+	answers: json('answers').notNull(),
+});
+
+export const step = pgTable(
+	"step",
+	{
+		id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+		onboardingId: integer('onboardingId').notNull().references(() => onboarding.id, { onDelete: 'cascade' }),
+		title: text('title').notNull(),
+		description: text('description').notNull(),
+		order: integer('order').notNull(),
+		type: stepsTypes(),
+		checklistId: integer('checklistId').references(() => checklist.id, { onDelete: 'set null' }),
+	},
+	(table) => [
+		check('checklist_id_not_null_check', sql`(${table.type} <> 'checklist' OR ${table.checklistId} IS NOT NULL)`)
+	]
+);
+
+export type Step = typeof step.$inferSelect;
