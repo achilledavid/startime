@@ -9,4 +9,4 @@ const client = createAuthClient({
   ],
 })
 
-export const { signIn, signOut, signUp, useSession, organization, useActiveOrganization, useListOrganizations } = client;
+export const { signIn, signOut, signUp, useSession, organization, useActiveOrganization, useListOrganizations, useActiveMember } = client;
