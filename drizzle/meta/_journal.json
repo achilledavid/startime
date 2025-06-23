@@ -15,6 +15,13 @@
       "when": 1750328973365,
       "tag": "0001_lazy_cerebro",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1750681829209,
+      "tag": "0002_married_stick",
+      "breakpoints": true
     }
   ]
 }

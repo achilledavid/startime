@@ -2,12 +2,9 @@ import { ChevronDown } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 import { SidebarMenuButton, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from "../ui/sidebar";
 import { MenuItem } from "./sidebar";
+import Link from "next/link";
 
-export default function CollapsibleMenuItem({
-  item
-}: {
-  item: MenuItem
-}) {
+export default function CollapsibleMenuItem({ slug, item }: { slug: string, item: MenuItem }) {
 
   return (
     <Collapsible className="group/collapsible">
@@ -23,10 +20,10 @@ export default function CollapsibleMenuItem({
           {item.items?.length && item.items.map((subItem) => (
             <SidebarMenuSubItem key={subItem.title}>
               <SidebarMenuSubButton asChild>
-                <a href={subItem.url}>
+                <Link href={"/" + slug + subItem.url}>
                   <subItem.icon />
                   <span>{subItem.title}</span>
-                </a>
+                </Link>
               </SidebarMenuSubButton>
             </SidebarMenuSubItem>
           ))}

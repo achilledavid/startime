@@ -1,15 +1,16 @@
+import Link from "next/link";
 import {
   SidebarMenuButton,
 } from "../ui/sidebar";
 import { MenuItem } from "./sidebar";
 
-export default function NormalMenuItem({ item }: { item: MenuItem }) {
+export default function NormalMenuItem({ slug, item }: { slug: string, item: MenuItem }) {
   return (
     <SidebarMenuButton asChild>
-      <a href={item.url}>
+      <Link href={"/" + slug + item.url}>
         <item.icon />
         <span>{item.title}</span>
-      </a>
+      </Link>
     </SidebarMenuButton>
   );
 }

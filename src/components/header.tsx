@@ -4,7 +4,7 @@ import AuthNavigation from "./auth/nav";
 
 export default function Header() {
   return (
-    <header className="homepage-header smin-h-14 flex items-center justify-between gap-4 max-w-7xl mx-auto px-4">
+    <header className="min-h-14 flex items-center justify-between gap-4 max-w-7xl mx-auto px-4">
       <Button asChild variant="link">
         <Link href="/">Startime</Link>
       </Button>

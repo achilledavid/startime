@@ -6,12 +6,18 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
-import { ChevronDown, LogOut, Settings, User } from "lucide-react";
-import { useSession } from "@/lib/auth-client";
+import { ChevronDown, LogOut, User } from "lucide-react";
+import { signOut, useSession } from "@/lib/auth-client";
 import { Avatar, AvatarFallback } from "../ui/avatar";
+import { redirect } from "next/navigation";
+import Link from "next/link";
 
 export default function UserItem() {
   const { data: session, isPending } = useSession();
+
+  async function handleSignOut() {
+    await signOut().then(() => redirect("/"));
+  }
 
   if (isPending || !session) return null;
 
@@ -48,19 +54,15 @@ export default function UserItem() {
           align="end"
           sideOffset={4}
         >
-          <DropdownMenuItem>
-            <User className="mr-2 h-4 w-4" />
-            Mon profil
+          <DropdownMenuItem asChild>
+            <Link href="/account">
+              <User className="mr-2 h-4 w-4" />
+              My account
+            </Link>
           </DropdownMenuItem>
-
-          <DropdownMenuItem>
-            <Settings className="mr-2 h-4 w-4" />
-            Paramètres
-          </DropdownMenuItem>
-
-          <DropdownMenuItem>
+          <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
             <LogOut className="mr-2 h-4 w-4" />
-            Déconnexion
+            Sign out
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
