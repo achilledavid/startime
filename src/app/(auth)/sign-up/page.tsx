@@ -43,7 +43,13 @@ export default function SignUp() {
   return (
     <Fragment>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-xl">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
+          <div className="flex flex-col items-center gap-2 text-center">
+            <h1 className="text-2xl font-bold">Create your account</h1>
+            <p className="text-muted-foreground text-sm text-balance">
+              Please enter your details below to sign up for Startime.
+            </p>
+          </div>
           <FormField
             control={form.control}
             name="name"
@@ -83,14 +89,14 @@ export default function SignUp() {
               </FormItem>
             )}
           />
-          <Button type="submit">Submit</Button>
+          <Button type="submit">Sign up</Button>
+          <Button type="button" variant="secondary" asChild>
+            <Link href="/sign-in">
+              Already have an account?
+            </Link>
+          </Button>
         </form>
       </Form>
-      <Button variant="secondary" asChild>
-        <Link href="/sign-in">
-          Already have an account?
-        </Link>
-      </Button>
     </Fragment>
   )
 }
