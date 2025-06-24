@@ -3,7 +3,6 @@
 import {
   Home,
   Users,
-  UserPlus,
   Route,
   FolderOpen,
   Edit,
