@@ -39,11 +39,11 @@ export default function SignIn() {
   return (
     <Fragment>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6 p-10 w-2xl">
-            <div className="flex flex-col items-center gap-2 text-center">
-            <h1 className="text-2xl font-bold">Welcome</h1>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
+          <div className="flex flex-col items-center gap-2 text-center">
+            <h1 className="text-2xl font-bold">Welcome back!</h1>
             <p className="text-muted-foreground text-sm text-balance">
-              Login to your account to your Startime account
+              Please enter your email and password below to sign in to your Startime account.
             </p>
           </div>
           <FormField
@@ -72,15 +72,15 @@ export default function SignIn() {
               </FormItem>
             )}
           />
-          <Button type="submit">Submit</Button>
+          <Button type="submit">Sign in</Button>
           <FormMessage />
+          <Button type="button" variant="secondary" asChild>
+            <Link href="/sign-up">
+              No account? Sign up
+            </Link>
+          </Button>
         </form>
       </Form>
-      <Button variant="secondary" asChild>
-        <Link href="/sign-up">
-          No account? Sign up
-        </Link>
-      </Button>
     </Fragment>
   )
 }
