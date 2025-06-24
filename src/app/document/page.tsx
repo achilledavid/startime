@@ -7,14 +7,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-
+import { TabsList } from "@radix-ui/react-tabs";
+import { Tabs, TabsContent, TabsTrigger } from "@/components/ui/tabs";
 import styles from './document.module.css';
 
 import { Download, Eye, Clock } from 'lucide-react';
+import { FileText, Gavel, Heart, Shield, Users, Building   } from 'lucide-react';
+
+
 
 export default function CardDemo() {
     return (
-        <div className={styles.container}>
+        
+            <Tabs defaultValue="documents">
+            <TabsList className="flex bg-gray-100 p-1">
+            <TabsTrigger value="documents"><FileText color="black"/>Documents</TabsTrigger>
+            <TabsTrigger value="juridique"><Gavel />Juridique</TabsTrigger>
+            <TabsTrigger value="securite"><Shield />Sécurité</TabsTrigger>
+            <TabsTrigger value="ressources_humaines"><Users />Ressources Humaines</TabsTrigger>
+            <TabsTrigger value="Entreprise"><Building />Entreprise</TabsTrigger>
+            <TabsTrigger value="Avantages"><Heart />Avantages</TabsTrigger>
+            </TabsList>
+            <TabsContent value="documents">
+            <div className={styles.container}>
             {Object.keys(Array(10).fill(0)).map((_, index) => (
             <Card key={index} className="w-full">
             <CardHeader>
@@ -36,6 +51,8 @@ export default function CardDemo() {
             </CardFooter>
             </Card>
             ))}
-        </div>
+            </div>
+            </TabsContent>
+            </Tabs>
     )
 }
