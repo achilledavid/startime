@@ -6,6 +6,8 @@ import { trpc } from "./client";
 import { httpBatchLink } from "@trpc/client";
 import { organization, useListOrganizations } from "@/lib/auth-client";
 import { isEmpty } from "lodash";
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+
 
 export default function Providers({ children }: PropsWithChildren) {
   const [queryClient] = useState(() => new QueryClient({}))
@@ -29,6 +31,7 @@ export default function Providers({ children }: PropsWithChildren) {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
+        <ReactQueryDevtools initialIsOpen={false} />
         {children}
       </QueryClientProvider>
     </trpc.Provider>

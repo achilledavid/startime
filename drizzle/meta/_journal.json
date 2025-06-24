@@ -15,6 +15,27 @@
       "when": 1750328973365,
       "tag": "0001_lazy_cerebro",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1750681829209,
+      "tag": "0002_married_stick",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1750684315026,
+      "tag": "0003_sparkling_rogue",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1750761112856,
+      "tag": "0004_spooky_squadron_supreme",
+      "breakpoints": true
     }
   ]
 }

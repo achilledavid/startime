@@ -1,11 +1,15 @@
-import OrganizationContent from "./content"
+"use client"
 
-export default async function Organization({ params }: { params: Promise<{ slug: string }> }) {
-    const { slug } = await params
+import { useOrganization } from "@/contexts/organization"
+
+export default function Organization() {
+    const { data, isPending } = useOrganization()
+
+    if (!data || isPending) return
 
     return (
-        <div className="p-4 space-y-4">
-            <OrganizationContent slug={slug} />
+        <div className="p-4">
+            <p>{data.organization.name}</p>
         </div>
     )
 }
