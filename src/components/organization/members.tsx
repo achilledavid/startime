@@ -1,10 +1,10 @@
-import { Organization } from "@/lib/organization";
+import { Organization } from "@/routers/organization";
 
 export default function OrganizationMembers({ organization }: { organization: Organization }) {
     return (
         <ul>
-            {organization.members.map((member) => (
-                <li key={member.id}>{member.user.name} - {member.role}</li>
+            {organization.members.map((item) => (
+                <li key={item.member.id}>{item.user?.name} - {item.member.role}</li>
             ))}
         </ul>
     )

@@ -1,5 +1,6 @@
 import z from "zod";
 
-export const organizationId = z.object({
-    id: z.string()
+export const getOrganization = z.object({
+    slug: z.string(),
+    userId: z.string()
 })
