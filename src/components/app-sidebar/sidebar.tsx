@@ -9,7 +9,6 @@ import {
   Edit,
   Eye,
   FileText,
-  Upload,
   Palette,
   Building,
   Settings,
@@ -152,19 +151,7 @@ const menuItems: MenuItem[] = [
   {
     title: "Resources & documents",
     icon: FileText,
-    items: [
-      {
-        title: "See all",
-        url: "/resources",
-        icon: FileText,
-      },
-      {
-        title: "Import / Upload",
-        url: "/resources/upload",
-        icon: Upload,
-        requiredRoles: ["owner"],
-      },
-    ],
+    url: "/resources",
   },
   // {
   //   title: "Outils de l'entreprise",

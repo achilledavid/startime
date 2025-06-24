@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, serial } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
 	id: text('id').primaryKey(),
@@ -72,4 +72,14 @@ export const invitation = pgTable("invitation", {
 	status: text('status').default("pending").notNull(),
 	expiresAt: timestamp('expires_at').notNull(),
 	inviterId: text('inviter_id').notNull().references(() => user.id, { onDelete: 'cascade' })
+});
+
+export const resources = pgTable("resources", {
+	id: serial('id').primaryKey(),
+	organizationId: text('organization_id').notNull().references(() => organization.id, { onDelete: 'cascade' }),
+	title: text("title").notNull(),
+	description: text("description"),
+	url: text("url").notNull().unique(),
+	createdAt: timestamp('created_at').notNull().$defaultFn(() => /* @__PURE__ */ new Date()),
+	size: text("size")
 });

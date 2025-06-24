@@ -8,7 +8,7 @@ export default function Members() {
     if (!data) return
 
     return (
-        <ul className="p-4">
+        <ul>
             {data.members.map((item) => (
                 <li key={item.member.id}>{item.user?.name} - {item.member.role}</li>
             ))}
