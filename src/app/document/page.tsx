@@ -21,7 +21,7 @@ export default function CardDemo() {
         
             <Tabs defaultValue="documents">
             <TabsList className="flex bg-gray-100 p-1">
-            <TabsTrigger value="documents"><FileText color="black"/>Documents</TabsTrigger>
+            <TabsTrigger value="documents"><FileText color="black"/>Tous les documents</TabsTrigger>
             <TabsTrigger value="juridique"><Gavel />Juridique</TabsTrigger>
             <TabsTrigger value="securite"><Shield />Sécurité</TabsTrigger>
             <TabsTrigger value="ressources_humaines"><Users />Ressources Humaines</TabsTrigger>
