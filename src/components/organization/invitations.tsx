@@ -18,7 +18,7 @@ export default function OrganizationInvitations({ invitations, refetch }: { invi
             <ul>
                 {invitations.map((invitation) => (
                     <li key={invitation.id} className="space-y-2">
-                        <p>{invitation.email} - {invitation.status}</p>
+                        <p>{invitation.email}</p>
                         <Button
                             onClick={() => handleCancel(invitation.id)}
                         >

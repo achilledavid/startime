@@ -8,8 +8,6 @@ export default function Organization() {
     if (!data || isPending) return
 
     return (
-        <div className="p-4">
-            <p>{data.organization.name}</p>
-        </div>
+        <p>{data.organization.name}</p>
     )
 }

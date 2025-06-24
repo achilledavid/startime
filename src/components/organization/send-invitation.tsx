@@ -44,7 +44,7 @@ export default function SendInvitation({ refetch }: { refetch?: () => void }) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="w-fit">Send invitation</Button>
+                <Button className="w-fit">Add a new member</Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>

@@ -53,19 +53,7 @@ const menuItems: MenuItem[] = [
   {
     title: "Members",
     icon: Users,
-    items: [
-      {
-        title: "Members list",
-        url: "/members",
-        icon: Users,
-      },
-      {
-        title: "Add a new member",
-        url: "/members/add",
-        icon: UserPlus,
-        requiredRoles: ["owner"],
-      },
-    ],
+    url: "/members",
   },
   // {
   //   title: "My profile",

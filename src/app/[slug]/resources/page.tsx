@@ -5,7 +5,7 @@ import UploadResource from "@/components/upload-resource"
 import { useOrganization } from "@/contexts/organization"
 import { isEmpty } from "lodash"
 import { Loader2 } from "lucide-react"
-import ResourceCard from "./components/resource-card"
+import ResourceCard from "./resource-card"
 import { useActiveMember } from "@/lib/auth-client"
 
 export default function Resources() {
@@ -22,7 +22,6 @@ export default function Resources() {
 
     return (
         <div className="space-y-4">
-            {member.role === "owner" && <UploadResource organization={data.organization} onSuccess={refetch} />}
             <div className="grid grid-cols-3 gap-4">
                 {(resources && !isEmpty(resources)) ?
                     resources.map((resource) => (
@@ -32,6 +31,7 @@ export default function Resources() {
                     )
                 }
             </div>
+            {member.role === "owner" && <UploadResource organization={data.organization} onSuccess={refetch} />}
         </div>
     )
 }
