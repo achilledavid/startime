@@ -1,4 +1,4 @@
-import { member as memberSchema, onboarding, steps } from '@/db/schema';
+import { member as memberSchema, onboarding, step } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { db } from "@/db";
 import { auth } from "@/lib/auth";
@@ -32,9 +32,9 @@ export const onboardingRouter = router({
 
             const stepsData = await tx
                 .select()
-                .from(steps)
-                .where(eq(steps.onboardingId, onboard[0].id))
-                .orderBy(steps.order);
+                .from(step)
+                .where(eq(step.onboardingId, onboard[0].id))
+                .orderBy(step.order);
 
             return {
                 data: onboard[0],
@@ -90,7 +90,7 @@ export const onboardingRouter = router({
                 });
             }
 
-            const insertedSteps = tx.insert(steps).values(stepsToInsert).returning();
+            const insertedSteps = tx.insert(step).values(stepsToInsert).returning();
 
             return {
                 onboarding: newOnboarding,

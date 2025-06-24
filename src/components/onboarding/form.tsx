@@ -1,3 +1,5 @@
+"use client";
+
 import { Onboarding } from "@/routers/onboarding";
 import { postOnboarding } from "@/schemas/onboarding";
 import { zodResolver } from "@hookform/resolvers/zod";

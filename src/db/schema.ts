@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, pgEnum, json, integer, check } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, pgEnum, integer, check, serial, jsonb } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
 export const user = pgTable("user", {
@@ -76,7 +76,7 @@ export const invitation = pgTable("invitation", {
 });
 
 export const onboarding = pgTable("onboarding", {
-	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+	id: serial('id').primaryKey(),
 	organizationId: text('organization_id').notNull().references(() => organization.id, { onDelete: 'cascade' }),
 	title: text('title').notNull(),
 	description: text('description').notNull(),
@@ -85,24 +85,33 @@ export const onboarding = pgTable("onboarding", {
 export const stepsTypes = pgEnum('steps_types', ['document', 'video', 'checklist']);
 
 export const checklist = pgTable("checklist", {
-	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-	answers: json('answers').notNull(),
+	id: serial('id').primaryKey(),
+	answers: jsonb('answers').notNull(),
 });
 
 export const step = pgTable(
 	"step",
 	{
-		id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-		onboardingId: integer('onboardingId').notNull().references(() => onboarding.id, { onDelete: 'cascade' }),
+		id: serial('id').primaryKey(),
+		onboardingId: serial('onboardingId').notNull().references(() => onboarding.id, { onDelete: 'cascade' }),
 		title: text('title').notNull(),
 		description: text('description').notNull(),
 		order: integer('order').notNull(),
 		type: stepsTypes(),
-		checklistId: integer('checklistId').references(() => checklist.id, { onDelete: 'set null' }),
+		checklistId: serial('checklistId').references(() => checklist.id, { onDelete: 'set null' }),
 	},
 	(table) => [
 		check('checklist_id_not_null_check', sql`(${table.type} <> 'checklist' OR ${table.checklistId} IS NOT NULL)`)
 	]
 );
+
+export const onboardingResponse = pgTable("onboarding_response", {
+	id: serial('id').primaryKey(),
+	onboardingId: serial('onboardingId').notNull().references(() => onboarding.id, { onDelete: 'cascade' }),
+	memberId: text('memberId').notNull().references(() => member.id, { onDelete: 'cascade' }),
+	createdAt: timestamp('createdAt').notNull().$defaultFn(() => /* @__PURE__ */ new Date()),
+	updatedAt: timestamp('updatedAt').notNull().$defaultFn(() => /* @__PURE__ */ new Date()),
+	completed: boolean('completed').$defaultFn(() => false).notNull(),
+});
 
 export type Step = typeof step.$inferSelect;
