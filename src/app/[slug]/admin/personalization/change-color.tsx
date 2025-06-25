@@ -2,7 +2,6 @@
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Organization } from "@/routers/organization";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -10,7 +9,6 @@ import { oklch, formatHex } from 'culori';
 import z from "zod";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/app/_trpc/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { RotateCcw } from "lucide-react";
 
@@ -73,7 +71,7 @@ export default function ChangeColor({ organization, refetch }: { organization: O
       <div>
         <strong className="text-lg font-semibold tracking-tight">Color Settings</strong>
         <p className="text-sm text-muted-foreground">
-          Choose a color that will be used throughout your organization's interface.
+          Choose a color that will be used throughout your organization&apos;s interface.
         </p>
       </div>
       <Form {...form}>
