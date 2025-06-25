@@ -12,7 +12,7 @@ export default async function OrganizationLayout({ params, children }: PropsWith
         <OrganizationProvider slug={slug} userId={user.id}>
             <SidebarProvider>
                 <AppSidebar />
-                <div className="p-4 w-full">
+                <div className="w-full">
                     {children}
                 </div>
             </SidebarProvider>
