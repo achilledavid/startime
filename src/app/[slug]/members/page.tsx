@@ -27,7 +27,7 @@ export default function Members() {
     const isOwner = member.role === "owner"
 
     return (
-        <div>
+        <Fragment>
             <div className="p-6">
                 <div>
                     <h1 className="text-2xl font-semibold tracking-tight">Team Members</h1>
@@ -67,6 +67,6 @@ export default function Members() {
                     )}
                 </Fragment>
             )}
-        </div>
+        </Fragment>
     )
 }
