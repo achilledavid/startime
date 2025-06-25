@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { organization } from "@/lib/auth-client";
 import { useMutation } from "@tanstack/react-query";
 import { createOrganization } from "@/lib/organization";
+import { Plus } from "lucide-react";
 
 const formSchema = z.object({
     name: z.string().min(2, "2 chars. min").max(128, "128 chars. max"),
@@ -48,11 +49,14 @@ export default function CreateOrganization() {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="w-fit">Create your organization</Button>
+                <Button>
+                    <Plus />
+                    Create organization
+                </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Create your organization</DialogTitle>
+                    <DialogTitle>Create a new organization</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -61,7 +65,7 @@ export default function CreateOrganization() {
                             name="name"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Name</FormLabel>
+                                    <FormLabel>Organization name</FormLabel>
                                     <FormControl>
                                         <Input {...field} />
                                     </FormControl>
@@ -69,7 +73,9 @@ export default function CreateOrganization() {
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit" disabled={mutation.isPending}>Submit</Button>
+                        <Button type="submit" disabled={mutation.isPending}>
+                            Create
+                        </Button>
                     </form>
                 </Form>
             </DialogContent>
