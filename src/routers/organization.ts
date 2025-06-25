@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { member, organization, user } from "@/db/schema";
-import { getOrganization } from "@/schemas/organization";
+import { getOrganization, putColor } from "@/schemas/organization";
 import { publicProcedure, router } from "@/server/trpc";
 import { eq } from "drizzle-orm";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
@@ -35,6 +35,27 @@ export const organizationRouter = router({
             organization: org[0],
             members,
         };
+    }),
+    putColor: publicProcedure.input(putColor).mutation(async (opts) => {
+        const data = opts.input;
+
+        const org = await db
+            .select()
+            .from(organization)
+            .where(eq(organization.slug, data.slug))
+            .limit(1);
+
+        if (!org[0]) {
+            throw new TRPCError({ code: "NOT_FOUND", message: "Organization not found" });
+        }
+
+        const updatedOrg = await db
+            .update(organization)
+            .set({ color: data.color })
+            .where(eq(organization.id, org[0].id))
+            .returning();
+
+        return updatedOrg[0];
     })
 });
 

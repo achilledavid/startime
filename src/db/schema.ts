@@ -53,7 +53,8 @@ export const organization = pgTable("organization", {
 	slug: text('slug').notNull().unique(),
 	logo: text('logo'),
 	createdAt: timestamp('created_at').notNull(),
-	metadata: text('metadata')
+	metadata: text('metadata'),
+	color: text('color').default("oklch(0.205 0 0)").notNull(),
 });
 
 export const member = pgTable("member", {

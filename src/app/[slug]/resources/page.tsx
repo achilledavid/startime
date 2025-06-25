@@ -27,7 +27,7 @@ export default function Resources() {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-semibold tracking-tight">Resources & Documents</h1>
-                        <p className="text-muted-foreground">All your team's important files and documents, organized in one place.</p>
+                        <p className="text-muted-foreground">All your team&apos;s important files and documents, organized in one place.</p>
                     </div>
                     {isOwner && <UploadResource organization={data.organization} onSuccess={refetch} />}
                 </div>

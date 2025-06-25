@@ -9,6 +9,7 @@ import { Fragment } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import InvitationCard from "./invitation-card";
+import { isEmpty } from "lodash";
 
 export default function Members() {
     const { data, refetch } = useOrganization();
@@ -59,11 +60,17 @@ export default function Members() {
                             <Loader2 className="size-4 animate-spin" />
                         </div>
                     ) : (
-                        <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {invitations.data.map((invitation) => (
-                                <InvitationCard key={invitation.id} invitation={invitation} isOwner={isOwner} refetch={refetchInvitations} />
-                            ))}
-                        </div>
+                        !isEmpty(invitations.data) ? (
+                            <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {invitations.data.map((invitation) => (
+                                    <InvitationCard key={invitation.id} invitation={invitation} isOwner={isOwner} refetch={refetchInvitations} />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="p-4">
+                                <p>No invitations yet</p>
+                            </div>
+                        )
                     )}
                 </Fragment>
             )}
