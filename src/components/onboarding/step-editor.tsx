@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import StepForm from "./step-form";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 
 export type RawStep = {
     id?: number;
@@ -11,18 +11,17 @@ export type RawStep = {
     description: string;
     order: number;
     type: "document" | "video" | "checklist";
-    checklistId?: number;
+    checklistId?: number | null;
     duration?: number;
-    value?: string | File;
+    value?: string | File | null;
 };
 
 type Props = {
-    initalSteps: RawStep[];
-    onUpdate: (steps: RawStep[]) => void
+    steps: RawStep[];
+    setSteps: Dispatch<SetStateAction<RawStep[]>>;
 };
 
-export default function StepEditor({ initalSteps = [], onUpdate }: Props) {
-    const [steps, setSteps] = useState<RawStep[]>([]);
+export default function StepEditor({ steps, setSteps }: Props) {
     const [stepToEdit, setStepToEdit] = useState<RawStep | null>(null);
 
     function newStep() {
@@ -32,6 +31,7 @@ export default function StepEditor({ initalSteps = [], onUpdate }: Props) {
             order: steps.length + 1,
             type: "document",
             duration: 0,
+            checklistId: undefined,
         };
         setSteps([...steps, newStep]);
     }
@@ -52,12 +52,17 @@ export default function StepEditor({ initalSteps = [], onUpdate }: Props) {
         }
         setSteps(newSteps);
         setStepToEdit(newSteps[index]);
-        onUpdate(newSteps);
+    }
+
+    function removeStep(index: number) {
+        const newSteps = steps.filter((_, i) => i !== index);
+        setSteps(newSteps);
+        setStepToEdit(null)
     }
 
     useEffect(() => {
-        if (initalSteps.length > 0) {
-            setSteps(initalSteps as RawStep[]);
+        if (steps.length > 0) {
+            setSteps(steps);
         } else {
             newStep();
         }
@@ -89,6 +94,7 @@ export default function StepEditor({ initalSteps = [], onUpdate }: Props) {
                                     <div className="flex-1 min-w-0">
                                         <p className="text-sm font-medium text-gray-900 mb-1">{step.title}</p>
                                         <p className="text-xs text-gray-500 mb-2 line-clamp-2">{step.description}</p>
+                                        <p>{step.checklistId}</p>
                                     </div>
                                 </div>
                                 <div className="flex flex-col space-y-1 ml-2">
@@ -112,6 +118,15 @@ export default function StepEditor({ initalSteps = [], onUpdate }: Props) {
                                     >
                                         <ChevronDown className="h-3 w-3" />
                                     </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-7 w-7 p-0"
+                                        type="button"
+                                        onClick={() => removeStep(index)}
+                                    >
+                                        <Trash2 className="h-3 w-3" />
+                                    </Button>
                                 </div>
                             </div>
                         </div>
@@ -124,7 +139,7 @@ export default function StepEditor({ initalSteps = [], onUpdate }: Props) {
                 </CardHeader>
                 <CardContent>
                     {stepToEdit ? (
-                        <StepForm index={steps.indexOf(stepToEdit)} step={stepToEdit} onUpdate={updateStep} />
+                        <StepForm key={stepToEdit.order} index={steps.indexOf(stepToEdit)} step={stepToEdit} onUpdate={updateStep} />
                     ) : (
                         <p>Select a step</p>
                     )}

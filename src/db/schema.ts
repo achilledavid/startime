@@ -93,12 +93,13 @@ export const step = pgTable(
 	"step",
 	{
 		id: serial('id').primaryKey(),
-		onboardingId: serial('onboardingId').notNull().references(() => onboarding.id, { onDelete: 'cascade' }),
+		onboardingId: integer('onboardingId').notNull().references(() => onboarding.id, { onDelete: 'cascade' }),
 		title: text('title').notNull(),
 		description: text('description').notNull(),
 		order: integer('order').notNull(),
-		type: stepsTypes(),
-		checklistId: serial('checklistId').references(() => checklist.id, { onDelete: 'set null' }),
+		type: stepsTypes().notNull(),
+		checklistId: integer('checklistId').references(() => checklist.id, { onDelete: 'set null' }),
+		value: text('value')
 	},
 	(table) => [
 		check('checklist_id_not_null_check', sql`(${table.type} <> 'checklist' OR ${table.checklistId} IS NOT NULL)`)
@@ -107,7 +108,7 @@ export const step = pgTable(
 
 export const onboardingResponse = pgTable("onboarding_response", {
 	id: serial('id').primaryKey(),
-	onboardingId: serial('onboardingId').notNull().references(() => onboarding.id, { onDelete: 'cascade' }),
+	onboardingId: integer('onboardingId').notNull().references(() => onboarding.id, { onDelete: 'cascade' }),
 	memberId: text('memberId').notNull().references(() => member.id, { onDelete: 'cascade' }),
 	createdAt: timestamp('createdAt').notNull().$defaultFn(() => /* @__PURE__ */ new Date()),
 	updatedAt: timestamp('updatedAt').notNull().$defaultFn(() => /* @__PURE__ */ new Date()),

@@ -1,29 +1,19 @@
-import { member as memberSchema, onboarding, step } from '@/db/schema';
+import { member as memberSchema, onboarding, Step, step } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { db } from "@/db";
-import { auth } from "@/lib/auth";
 import { publicProcedure, router } from "@/server/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
-import { getOnboarding, postOnboarding } from '@/schemas/onboarding';
+import { deleteOnboarding, getAllOnboardings, getOnboarding, postOnboarding, putOnboarding } from '@/schemas/onboarding';
 
 export const onboardingRouter = router({
     get: publicProcedure.input(getOnboarding).query(async (opts) => {
         const { input } = opts;
-        const member = await db
-            .select()
-            .from(memberSchema)
-            .where(eq(memberSchema.userId, input.userId))
-            .limit(1);
-
-        if (!member[0]) {
-            throw new Error("User is not authenticated");
-        }
 
         const transaction = await db.transaction(async (tx) => {
             const onboard = await db
                 .select()
                 .from(onboarding)
-                .where(eq(onboarding.organizationId, member[0].organizationId))
+                .where(eq(onboarding.id, input.onboardingId))
                 .limit(1);
 
             if (onboard.length === 0) {
@@ -50,38 +40,48 @@ export const onboardingRouter = router({
     }),
 
     post: publicProcedure.input(postOnboarding).mutation(async (opts) => {
+
         const { input } = opts;
-        const member = await auth.api.getActiveMember();
-
-        if (!member) {
-            throw new Error("User is not authenticated");
-        }
-
-        const existingOnboarding = await db
+        const member = await db
             .select()
-            .from(onboarding)
-            .where(eq(onboarding.organizationId, member.organizationId))
+            .from(memberSchema)
+            .where(eq(memberSchema.userId, input.userId))
             .limit(1);
 
-        if (existingOnboarding.length > 0) {
-            throw new TRPCError({ code: "CONFLICT", message: "Onboarding already exists" });
+        if (!member[0]) {
+            throw new TRPCError({
+                code: "UNAUTHORIZED",
+                message: "User is not authenticated"
+            });
+        }
+
+        if (member[0].role !== "owner") {
+            throw new TRPCError({
+                code: "FORBIDDEN",
+                message: "Only owners can create onboarding steps"
+            });
         }
 
         const transaction = await db.transaction(async (tx) => {
+            console.log(input, member)
             const [newOnboarding] = await tx.insert(onboarding).values({
-                organizationId: member.organizationId,
+                organizationId: member[0].organizationId,
                 title: input.title,
                 description: input.description,
             }).returning();
 
-            const stepsToInsert = input.steps.map((step, index) => ({
-                onboardingId: newOnboarding.id,
-                title: step.title,
-                description: step.description,
-                order: step.order,
-                type: step.type,
-                checklistId: step.checklist ? null : undefined, // Set to null if no checklist
-            }));
+            const stepsToInsert = input.steps.map(function (step, index) {
+                // TODO: introduce file upload
+                return {
+                    onboardingId: newOnboarding.id,
+                    title: step.title,
+                    description: step.description,
+                    order: step.order,
+                    type: step.type,
+                    checklistId: step.checklistId ?? null,
+                    value: step.value instanceof File ? '' : step.value
+                }
+            });
 
             if (input.steps.length === 0) {
                 tx.rollback();
@@ -90,7 +90,7 @@ export const onboardingRouter = router({
                 });
             }
 
-            const insertedSteps = tx.insert(step).values(stepsToInsert).returning();
+            const insertedSteps = await tx.insert(step).values(stepsToInsert).returning();
 
             return {
                 onboarding: newOnboarding,
@@ -99,6 +99,156 @@ export const onboardingRouter = router({
         })
 
         return transaction
+
+    }),
+
+    put: publicProcedure.input(putOnboarding).mutation(async (opts) => {
+        const { input } = opts;
+        const member = await db
+            .select()
+            .from(memberSchema)
+            .where(eq(memberSchema.userId, input.userId))
+            .limit(1);
+
+        if (!member[0]) {
+            throw new TRPCError({
+                code: "UNAUTHORIZED",
+                message: "User is not authenticated"
+            });
+        }
+
+        if (member[0].role !== "owner") {
+            throw new TRPCError({
+                code: "FORBIDDEN",
+                message: "Only owners can modify onboarding steps"
+            });
+        }
+
+        const onboard = await db
+            .select()
+            .from(onboarding)
+            .where(eq(onboarding.id, input.onBoardingId))
+            .limit(1)
+
+
+        if (!onboard[0]) {
+            throw new TRPCError({
+                code: "NOT_FOUND",
+                message: "Onboarding not found"
+            });
+        }
+
+
+        const transaction = await db.transaction(async (tx) => {
+            const updatedOnboarding = await tx.update(onboarding).set({
+                description: input.description,
+                title: input.title
+            }).returning()
+
+            const stepsToUpdate = input.steps.map(function (step, index) {
+                // TODO: introduce file upload
+
+                return {
+                    id: step.id,
+                    title: step.title,
+                    description: step.description,
+                    order: step.order,
+                    type: step.type,
+                    checklistId: step.checklistId ?? null,
+                    value: step.value instanceof File ? '' : step.value
+                }
+            });
+
+            const stepsToReturn: Step[] = [];
+
+            await Promise.all(stepsToUpdate.map(async (stepToUpdate) => {
+                let tmp;
+                if (stepToUpdate.id) {
+                    tmp = await tx.update(step).set({
+                        title: stepToUpdate.title,
+                        description: stepToUpdate.description,
+                        order: stepToUpdate.order,
+                        type: stepToUpdate.type,
+                        checklistId: stepToUpdate.checklistId,
+                        value: stepToUpdate.value
+                    }).where(eq(step.id, stepToUpdate.id)).returning()
+
+                } else {
+                    tmp = await tx.insert(step).values({
+                        onboardingId: updatedOnboarding[0].id,
+                        title: stepToUpdate.title,
+                        description: stepToUpdate.description,
+                        order: stepToUpdate.order,
+                        type: stepToUpdate.type,
+                        checklistId: stepToUpdate.checklistId ?? null,
+                        value: stepToUpdate.value
+                    }).returning()
+
+                }
+
+                stepsToReturn.push(tmp[0])
+            }))
+
+            return {
+                onboarding: updatedOnboarding,
+                steps: stepsToReturn,
+            }
+        })
+
+        return transaction
+    }),
+
+    getAll: publicProcedure.input(getAllOnboardings).query(async (opts) => {
+        const { input } = opts;
+
+        const onboardings = await db
+            .select()
+            .from(onboarding)
+            .where(eq(onboarding.organizationId, input.organizationId))
+            .limit(input.limit)
+            .offset(input.offset);
+
+        console.log("Onboardings found:", onboardings);
+
+        return onboardings;
+    }),
+
+    delete: publicProcedure.input(deleteOnboarding).mutation(async (opts) => {
+        const { input } = opts;
+
+        const member = await db
+            .select()
+            .from(memberSchema)
+            .where(eq(memberSchema.userId, input.userId))
+            .limit(1);
+
+        if (!member[0]) {
+            throw new TRPCError({
+                code: "UNAUTHORIZED",
+                message: "User is not authenticated"
+            });
+        }
+
+        if (member[0].role !== "owner") {
+            throw new TRPCError({
+                code: "FORBIDDEN",
+                message: "Only owners can delete onboardings"
+            });
+        }
+
+        const deletedOnboarding = await db
+            .delete(onboarding)
+            .where(eq(onboarding.id, input.onboardingId))
+            .returning();
+
+        if (deletedOnboarding.length === 0) {
+            throw new TRPCError({
+                code: "NOT_FOUND",
+                message: "Onboarding not found"
+            });
+        }
+
+        return deletedOnboarding[0];
     })
 });
 

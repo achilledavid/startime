@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { RawStep } from './step-editor';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -41,6 +41,11 @@ function StepForm({ step, onUpdate, index }: StepFormProps) {
 
         setStepData({ ...stepData, value });
         onUpdate(index, { ...stepData, value });
+    };
+
+    function handleChecklistCreation(checklistId: number) {
+        setStepData({ ...stepData, checklistId });
+        onUpdate(index, { ...stepData, checklistId });
     };
 
     return (
@@ -91,7 +96,7 @@ function StepForm({ step, onUpdate, index }: StepFormProps) {
                 <DocumentField defaultValue={stepData.value && typeof stepData.value === 'string' ? new File([], stepData.value) : null} onUpdate={handleSpecificFileFieldUpdate} />
             )}
             {stepData.type === 'checklist' && (
-                <ChecklistField />
+                <ChecklistField onCreate={handleChecklistCreation} checklistId={stepData?.checklistId} />
             )}
             <div className='w-full space-y-2'>
                 <Label>Duration (minutes)</Label>
