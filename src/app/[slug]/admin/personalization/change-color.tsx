@@ -45,6 +45,7 @@ export default function ChangeColor({ organization, refetch }: { organization: O
     defaultValues: {
       color: hexColor,
     },
+    mode: "onChange",
   })
 
   const onSubmit = async (values: z.infer<typeof personalizationSchema>) => {
