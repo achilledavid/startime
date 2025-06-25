@@ -36,7 +36,14 @@ export const OrganizationProvider: React.FC<OrganizationProviderProps> = ({ slug
 
     return (
         <OrganizationContext.Provider value={contextValue}>
-            {children}
+            <div
+                style={{
+                    '--primary': data?.organization.color,
+                    '--ring': data?.organization.color
+                } as React.CSSProperties}
+            >
+                {children}
+            </div>
         </OrganizationContext.Provider>
     );
 };

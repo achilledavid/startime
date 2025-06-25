@@ -3,13 +3,11 @@
 import {
   Home,
   Users,
-  UserPlus,
   Route,
   FolderOpen,
   Edit,
   Eye,
   FileText,
-  Upload,
   Palette,
   Building,
   Settings,
@@ -54,19 +52,7 @@ const menuItems: MenuItem[] = [
   {
     title: "Members",
     icon: Users,
-    items: [
-      {
-        title: "Members list",
-        url: "/members",
-        icon: Users,
-      },
-      {
-        title: "Add a new member",
-        url: "/members/add",
-        icon: UserPlus,
-        requiredRoles: ["owner"],
-      },
-    ],
+    url: "/members",
   },
   // {
   //   title: "My profile",
@@ -152,19 +138,7 @@ const menuItems: MenuItem[] = [
   {
     title: "Resources & documents",
     icon: FileText,
-    items: [
-      {
-        title: "See all",
-        url: "/resources",
-        icon: FileText,
-      },
-      {
-        title: "Import / Upload",
-        url: "/resources/upload",
-        icon: Upload,
-        requiredRoles: ["owner"],
-      },
-    ],
+    url: "/resources",
   },
   // {
   //   title: "Outils de l'entreprise",
@@ -272,7 +246,7 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton size="lg" asChild>
                   <Link href={`/${data.organization.slug}`}>
-                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                       <Building className="size-4" />
                     </div>
                     <div className="flex flex-col gap-0.5 leading-none">

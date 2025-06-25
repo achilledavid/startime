@@ -54,7 +54,8 @@ export const organization = pgTable("organization", {
 	slug: text('slug').notNull().unique(),
 	logo: text('logo'),
 	createdAt: timestamp('created_at').notNull(),
-	metadata: text('metadata')
+	metadata: text('metadata'),
+	color: text('color').default("oklch(0.205 0 0)").notNull(),
 });
 
 export const member = pgTable("member", {
@@ -114,5 +115,18 @@ export const onboardingResponse = pgTable("onboarding_response", {
 	updatedAt: timestamp('updatedAt').notNull().$defaultFn(() => /* @__PURE__ */ new Date()),
 	completed: boolean('completed').$defaultFn(() => false).notNull(),
 });
+
+
+export const resources = pgTable("resources", {
+	id: serial('id').primaryKey(),
+	organizationId: text('organization_id').notNull().references(() => organization.id, { onDelete: 'cascade' }),
+	title: text("title").notNull(),
+	description: text("description"),
+	url: text("url").notNull().unique(),
+	createdAt: timestamp('created_at').notNull().$defaultFn(() => /* @__PURE__ */ new Date()),
+	size: text("size")
+});
+
+
 
 export type Step = typeof step.$inferSelect;

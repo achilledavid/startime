@@ -1,7 +1,8 @@
 import { organization } from "@/lib/auth-client";
 import { invitation } from "@/db/schema";
 
-export type Invitations = Array<typeof invitation.$inferSelect>;
+export type Invitation = Array<typeof invitation.$inferSelect>[number];
+export type Invitations = Array<Invitation>;
 
 export async function createOrganization({ name }: { name: string }) {
     const slug = name
