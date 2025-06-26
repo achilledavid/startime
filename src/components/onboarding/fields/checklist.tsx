@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, Trash2, Save } from "lucide-react"
 import { trpc } from "@/app/_trpc/client"
 import { AnswersFromChecklist } from "../render"
+import { isEmpty } from "lodash"
 
 export interface ChecklistItem {
     id: string
@@ -102,47 +103,37 @@ export default function ChecklistField({ checklistId, className, onCreate }: Che
 
     return (
         <Card className={className}>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <Save className="h-5 w-5" />
-                    {checklistId ? "Modify the checklist" : "Create a checklist"}
-                </CardTitle>
-            </CardHeader>
             <CardContent className="space-y-4">
-
-                <div className="space-y-3">
-                    <Label>Add checklist items</Label>
+                <div className="space-y-2">
+                    <Label>Add a new item</Label>
                     <div className="flex gap-2">
                         <Input
-                            placeholder="Add an item..."
                             value={newItemText}
                             onChange={(e) => setNewItemText(e.target.value)}
                             onKeyPress={handleKeyPress}
                             className="flex-1"
                         />
-                        <Button onClick={addItem} size="sm" disabled={!newItemText.trim()}>
-                            <Plus className="h-4 w-4" />
+                        <Button onClick={addItem} size="icon" disabled={!newItemText.trim()}>
+                            <Plus />
                         </Button>
                     </div>
                 </div>
 
                 <div className="space-y-2">
-                    {items.length !== 0 && (
-                        <div className="space-y-2">
-                            <p className="text-sm text-gray-600 font-medium">{items.length} item(s):</p>
+                    {!isEmpty(items) && (
+                        <div className="space-y-4">
                             {items.map((item, index) => (
-                                <div key={item.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                                    <span className="text-sm text-gray-500 font-mono w-6">{index + 1}.</span>
+                                <div key={item.id} className="flex items-center gap-2">
+                                    <span className="text-sm text-muted-foreground min-w-4">{index + 1}.</span>
                                     <Input
                                         value={item.text}
                                         onChange={(e) => updateItem(item.id, e.target.value)}
-                                        className="flex-1 bg-white"
+                                        className="flex-1"
                                     />
                                     <Button
-                                        variant="ghost"
-                                        size="sm"
+                                        variant="destructive"
+                                        size="icon"
                                         onClick={() => deleteItem(item.id)}
-                                        className="text-gray-400 hover:text-red-500"
                                     >
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
@@ -151,10 +142,8 @@ export default function ChecklistField({ checklistId, className, onCreate }: Che
                         </div>
                     )}
                 </div>
-
-                <Button type="button" onClick={handleSave} disabled={!canSave} className="w-full" size="lg">
-                    <Save className="h-4 w-4 mr-2" />
-                    {checklistId ? "Update the checklist" : "Create the checklist"}
+                <Button type="button" onClick={handleSave} disabled={!canSave || isPending || updateChecklist.isPending}>
+                    Save
                 </Button>
             </CardContent>
         </Card>

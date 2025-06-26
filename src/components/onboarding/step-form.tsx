@@ -113,11 +113,10 @@ function StepForm({ step, onUpdate, index }: StepFormProps) {
                         );
                     case 'document':
                         return (
-                            <></>
-                            // <DocumentField
-                            //     defaultValue={stepData.value && typeof stepData.value === 'string' ? new File([], stepData.value) : null}
-                            //     onUpdate={handleSpecificFileFieldUpdate}
-                            // />
+                            <DocumentField
+                                defaultValue={stepData.value && typeof stepData.value === 'string' ? new File([], stepData.value) : null}
+                                onUpdate={handleSpecificFileFieldUpdate}
+                            />
                         );
                     case 'checklist':
                         return (

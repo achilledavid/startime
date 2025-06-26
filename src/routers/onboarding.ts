@@ -1,5 +1,5 @@
 import { member as memberSchema, onboarding, onboardingResponse, Step, step } from '@/db/schema';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import { db } from "@/db";
 import { publicProcedure, router } from "@/server/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
@@ -140,6 +140,20 @@ export const onboardingRouter = router({
                 description: input.description,
                 title: input.title
             }).returning()
+
+            const existingSteps = await tx
+                .select()
+                .from(step)
+                .where(eq(step.onboardingId, input.onBoardingId));
+
+            const stepsToDelete = existingSteps.filter(existingStep =>
+                !input.steps.some(inputStep => inputStep.id === existingStep.id)
+            );
+
+            if (stepsToDelete.length > 0) {
+                const stepIdsToDelete = stepsToDelete.map(s => s.id);
+                await tx.delete(step).where(inArray(step.id, stepIdsToDelete));
+            }
 
             const stepsToUpdate = input.steps.map(function (step) {
                 return {

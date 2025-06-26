@@ -1,5 +1,4 @@
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
-import { Button } from "@/components/ui/button";
+import { ChangeEvent } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useMutation } from '@tanstack/react-query';
@@ -12,20 +11,9 @@ interface DocumentFieldProps {
 }
 
 function DocumentField({ onUpdate, defaultValue }: DocumentFieldProps) {
-    const [file, setFile] = useState<File | null>(defaultValue || null);
-    const inputRef = useRef<HTMLInputElement>(null);
-    const { data: organization, isPending } = useActiveOrganization();
-
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0] || null;
-        setFile(file);
-    };
-
-    const handleButtonClick = () => {
-        inputRef.current?.click();
-    };
-
     const defaultFileName = defaultValue ? defaultValue.name : '';
+
+    const { data: organization } = useActiveOrganization();
 
     const blobMutation = useMutation({
         mutationFn: async (file: File) => {
@@ -33,18 +21,26 @@ function DocumentField({ onUpdate, defaultValue }: DocumentFieldProps) {
         }
     })
 
-    async function uploadCurrentFile(file: File) {
-        const res = await blobMutation.mutateAsync(file);
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files || e.target.files.length === 0 || !organization) return
+        blobMutation.mutate(e.target.files[0], {
+            onSuccess: (res) => {
+                onUpdate(res.url);
+            }
+        })
+    };
 
-        onUpdate(res.url);
-    }
-
-
-    useEffect(() => {
-        if (isPending || !file || !organization) return;
-
-        uploadCurrentFile(file);
-    }, [file]);
+    const parseFileNameFromUrl = (url: string): string => {
+        try {
+            const decodedUrl = decodeURIComponent(url);
+            const pathParts = decodedUrl.split('/');
+            const fileName = pathParts[pathParts.length - 1];
+            return fileName;
+        } catch (error) {
+            console.error('Error parsing filename from URL:', error);
+            return url;
+        }
+    };
 
     return (
         <div className="space-y-2">
@@ -52,23 +48,17 @@ function DocumentField({ onUpdate, defaultValue }: DocumentFieldProps) {
             <Input
                 id="document-upload"
                 type="file"
-                ref={inputRef}
                 onChange={handleChange}
-                className="hidden"
+                disabled={blobMutation.isPending}
             />
-            <Button type="button" variant="outline" onClick={handleButtonClick}>
-                Choose File
-            </Button>
-
-            {defaultFileName && (
+            {blobMutation.isPending && (
                 <div className="text-sm text-muted-foreground">
-                    Current file: {defaultFileName}
+                    Uploading file...
                 </div>
             )}
-
-            {file && (
-                <div className="text-sm text-muted-foreground mt-2">
-                    Selected file: {file.name}
+            {defaultFileName && !blobMutation.isPending && (
+                <div className="text-sm text-muted-foreground">
+                    Current file: {parseFileNameFromUrl(defaultFileName)}
                 </div>
             )}
         </div>

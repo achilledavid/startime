@@ -12,9 +12,11 @@ import { trpc } from "@/app/_trpc/client";
 import { useActiveMember } from "@/lib/auth-client";
 import { useEffect, useState } from "react";
 import { Textarea } from "../ui/textarea";
+import { redirect } from "next/navigation";
 
 type OnboardingFormProps = {
     onboarding?: Onboarding;
+    onSuccess?: () => void;
 };
 
 export const formSchema = z.object({
@@ -31,7 +33,7 @@ export const formSchema = z.object({
     }))
 })
 
-export default function OnboardingForm({ onboarding }: OnboardingFormProps) {
+export default function OnboardingForm({ onboarding, onSuccess }: OnboardingFormProps) {
     const { data: member } = useActiveMember()
     const [steps, setSteps] = useState<RawStep[]>(onboarding?.steps || []);
 
@@ -43,36 +45,47 @@ export default function OnboardingForm({ onboarding }: OnboardingFormProps) {
         defaultValues: {
             title: onboarding?.data.title || "",
             description: onboarding?.data.description || "",
+            steps: onboarding?.steps || [],
         }
     })
 
     function handleSubmit(data: z.infer<typeof formSchema>) {
-        if (!member) return
-
         if (onboarding) {
             updateOnboarding.mutate({
                 onBoardingId: onboarding.data.id,
                 title: data.title,
                 description: data.description,
-                steps: data.steps,
-                userId: member.userId
-            });
+                steps: data?.steps || [],
+                userId: member?.userId || ""
+            }, { onSuccess });
         } else {
             createOnboarding.mutate({
                 title: data.title,
                 description: data.description,
                 steps: data.steps,
-                userId: member.userId
-            });
-
-            form.reset();
-            setSteps([]);
+                userId: member?.userId || ""
+            }, { onSuccess });
         }
     }
 
-    // useEffect(() => {
-    //     form.setValue("steps", steps);
-    // }, [steps]);
+    useEffect(() => {
+        form.setValue("steps", steps);
+    }, [steps, form]);
+
+    useEffect(() => {
+        if (!onboarding) {
+            const defaultStep: RawStep = {
+                id: undefined,
+                title: "",
+                description: "",
+                type: "document",
+                order: 0,
+                checklistId: null,
+                value: null
+            };
+            setSteps([defaultStep]);
+        }
+    }, [onboarding])
 
     return (
         <Form {...form}>

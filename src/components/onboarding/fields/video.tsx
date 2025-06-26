@@ -26,8 +26,6 @@ export function VideoField({
                 type="url"
                 value={url}
                 onChange={handleChange}
-                placeholder="Enter video URL"
-                style={{ width: "100%" }}
             />
         </div>
     );

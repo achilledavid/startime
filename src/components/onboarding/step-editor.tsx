@@ -1,8 +1,8 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import StepForm from "./step-form";
-import { ChevronDown, ChevronUp, MoreVertical, Plus, Trash, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, MoreVertical, Plus, Trash } from "lucide-react";
 import { getStepIcon } from "../steps/step";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { cn } from "@/lib/utils";
@@ -28,49 +28,44 @@ export default function StepEditor({ steps, setSteps }: Props) {
     const [stepToEdit, setStepToEdit] = useState<RawStep>();
 
     function newStep() {
-        // const newStep: RawStep = {
-        //     id: undefined,
-        //     title: "",
-        //     description: "",
-        //     order: steps.length + 1,
-        //     type: "document",
-        //     duration: 2,
-        //     checklistId: undefined,
-        // };
-        // setSteps([...steps, newStep]);
+        const newStep: RawStep = {
+            id: undefined,
+            title: "",
+            description: "",
+            order: steps.length + 1,
+            type: "document",
+            duration: 2,
+            checklistId: undefined,
+        };
+        setSteps([...steps, newStep]);
     }
 
     function updateStep(index: number, updatedStep: RawStep) {
-        // const newSteps = [...steps];
-        // newSteps[index] = updatedStep;
-        // setSteps(newSteps);
-        // setStepToEdit(updatedStep);
+        const newSteps = [...steps];
+        newSteps[index] = updatedStep;
+        setSteps(newSteps);
+        setStepToEdit(updatedStep);
     }
 
     function moveStep(index: number, direction: "up" | "down") {
         const newSteps = [...steps];
         if (direction === "up" && index > 0) {
             [newSteps[index - 1], newSteps[index]] = [newSteps[index], newSteps[index - 1]];
+            newSteps[index - 1].order = index;
+            newSteps[index].order = index + 1;
         } else if (direction === "down" && index < newSteps.length - 1) {
             [newSteps[index + 1], newSteps[index]] = [newSteps[index], newSteps[index + 1]];
+            newSteps[index].order = index + 1;
+            newSteps[index + 1].order = index + 2;
         }
         setSteps(newSteps);
-        setStepToEdit(newSteps[index]);
     }
 
     function removeStep(index: number) {
-        // const newSteps = steps.filter((_, i) => i !== index);
-        // setSteps(newSteps)
+        const newSteps = steps.filter((_, i) => i !== index);
+        setSteps(newSteps)
         setStepToEdit(undefined)
     }
-
-    // useEffect(() => {
-    //     if (steps.length > 0) {
-    //         setSteps(steps)
-    //     } else {
-    //         newStep();
-    //     }
-    // }, []);
 
     return (
         <div className="w-full grid grid-cols-12 gap-4">
@@ -86,17 +81,17 @@ export default function StepEditor({ steps, setSteps }: Props) {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {steps.map((step, index) => {
-                        const StepIcon = getStepIcon(step.type);
+                        const StepIcon = getStepIcon(step.type)
+
                         return (
                             <div
                                 key={step.id + "-" + step.order}
                                 className={cn(
-                                    "p-4 rounded-lg border cursor-pointer flex justify-between items-center gap-4",
+                                    "pr-4 rounded-lg border cursor-pointer flex justify-between items-center",
                                     stepToEdit && (stepToEdit.order === step.order) ? "border-primary bg-primary/10 text-primary" : "border-gray-200 text-foreground")
                                 }
-                                onClick={() => setStepToEdit(step)}
                             >
-                                <div className="space-y-1">
+                                <div className="space-y- w-full p-4 pr-0" onClick={() => setStepToEdit(step)}>
                                     <div className="flex items-center gap-1.5">
                                         <StepIcon className="size-4" />
                                         <p className="text-sm font-medium">{step.title || "Untitled step"}</p>
