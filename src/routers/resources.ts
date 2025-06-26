@@ -1,9 +1,10 @@
 import { db } from "@/db";
 import { resources } from "@/db/schema";
-import { getResources, postResources } from "@/schemas/resources";
+import { deleteResources, getResources, postResources } from "@/schemas/resources";
 import { publicProcedure, router } from "@/server/trpc";
 import { eq } from "drizzle-orm";
-import { inferRouterOutputs } from "@trpc/server";
+import { inferRouterOutputs, TRPCError } from "@trpc/server";
+import { del } from "@vercel/blob";
 
 export const resourcesRouter = router({
     get: publicProcedure.input(getResources).query(async (opts) => {
@@ -23,6 +24,21 @@ export const resourcesRouter = router({
                 organizationId: data.id,
                 ...data.payload,
             })
+    }),
+    delete: publicProcedure.input(deleteResources).mutation(async (opts) => {
+        const data = opts.input;
+
+        try {
+            const res = await db
+                .delete(resources)
+                .where(eq(resources.url, data.url))
+
+            const blob = await del(data.url);
+
+            return { res, blob };
+        } catch {
+            return new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to delete resource' })
+        }
     }),
 })
 

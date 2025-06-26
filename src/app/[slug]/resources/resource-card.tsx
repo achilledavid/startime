@@ -1,15 +1,41 @@
+import { trpc } from "@/app/_trpc/client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Resource } from "@/routers/resources";
-import { Clock, Download } from "lucide-react";
+import { Clock, Download, MoreVertical, Trash } from "lucide-react";
 import Link from "next/link";
 
-export default function ResourceCard({ resource }: { resource: Resource }) {
+export default function ResourceCard({ resource, isOwner = false, refetch }: { resource: Resource, isOwner?: boolean, refetch: () => void }) {
+    const mutation = trpc.resources.delete.useMutation({
+        onSuccess: () => {
+            refetch()
+        }
+    })
+
+    async function handleRemove() {
+        await mutation.mutateAsync({ url: resource.url })
+    }
+
     return (
         <Card>
             <CardHeader>
                 <CardTitle>{resource.title}</CardTitle>
                 <CardDescription>{resource.description}</CardDescription>
+                {isOwner && (
+                    <CardAction>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                    <MoreVertical className="w-4 h-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem variant="destructive" onClick={handleRemove}><Trash />Remove</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </CardAction>
+                )}
             </CardHeader>
             <CardContent className="flex items-center gap-4 text-muted-foreground text-sm">
                 <p>{resource.size}</p>

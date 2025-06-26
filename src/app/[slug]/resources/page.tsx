@@ -21,6 +21,7 @@ export default function Resources() {
     if (!data || !member) return
 
     const isOwner = member.role === "owner"
+
     return (
         <Fragment>
             <div className="p-6">
@@ -42,7 +43,7 @@ export default function Resources() {
                     (resources && !isEmpty(resources)) ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {resources.map((resource) => (
-                                <ResourceCard key={resource.id} resource={resource} />
+                                <ResourceCard key={resource.id} resource={resource} isOwner={isOwner} refetch={refetch} />
                             ))}
                         </div>
                     ) : (

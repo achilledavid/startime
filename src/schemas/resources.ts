@@ -13,3 +13,7 @@ export const postResources = z.object({
         url: z.string()
     })
 })
+
+export const deleteResources = z.object({
+    url: z.string(),
+})
