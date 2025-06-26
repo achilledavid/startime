@@ -100,7 +100,8 @@ export const step = pgTable(
 		order: integer('order').notNull(),
 		type: stepsTypes().notNull(),
 		checklistId: integer('checklistId').references(() => checklist.id, { onDelete: 'set null' }),
-		value: text('value')
+		value: text('value'),
+		duration: integer('duration').default(0).notNull(),
 	},
 	(table) => [
 		check('checklist_id_not_null_check', sql`(${table.type} <> 'checklist' OR ${table.checklistId} IS NOT NULL)`)

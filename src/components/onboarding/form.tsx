@@ -28,7 +28,8 @@ export const formSchema = z.object({
         description: z.string().min(1, "Step description is required"),
         order: z.number().int().min(0, "Order must be a non-negative integer"),
         checklistId: z.number().optional().nullable(),
-        value: z.string().optional().nullable()
+        value: z.string().optional().nullable(),
+        duration: z.number().int().min(0, "Duration must be a non-negative integer")
     }))
 })
 
@@ -80,7 +81,8 @@ export default function OnboardingForm({ onboarding, onSuccess }: OnboardingForm
                 type: "document",
                 order: 0,
                 checklistId: null,
-                value: null
+                value: null,
+                duration: 0
             };
             setSteps([defaultStep]);
         }

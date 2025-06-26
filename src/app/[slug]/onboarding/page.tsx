@@ -38,9 +38,7 @@ export default function Onboarding() {
     }, [initialResponses])
 
     // TODO: get duration from db
-    // const duration = onboarding?.steps?.reduce((total, step) => total + (step.duration), 0) || 0;
-
-    const duration = onboarding?.steps?.reduce((total) => total + (5), 0) || 0;
+    const duration = onboarding?.steps?.reduce((total, step) => total + (step.duration), 0) || 0;
 
     function onComplete() {
         setStep(0)

@@ -49,6 +49,17 @@ function StepForm({ step, onUpdate, index }: StepFormProps) {
         onUpdate(index, { ...stepData, checklistId });
     };
 
+    function handleDurationChange(e: ChangeEvent<HTMLInputElement>) {
+        const value = parseInt(e.target.value, 10);
+        if (isNaN(value) || value < 0) {
+            setStepData({ ...stepData, duration: 0 });
+            onUpdate(index, { ...stepData, duration: 0 });
+        } else {
+            setStepData({ ...stepData, duration: value });
+            onUpdate(index, { ...stepData, duration: value });
+        }
+    };
+
     return (
         <div className='space-y-4'>
             <div className='flex gap-4'>
@@ -135,7 +146,7 @@ function StepForm({ step, onUpdate, index }: StepFormProps) {
                     type="number"
                     name="duration"
                     value={stepData.duration}
-                    onChange={handleChange}
+                    onChange={handleDurationChange}
                 />
             </div>
         </div>

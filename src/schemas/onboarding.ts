@@ -13,7 +13,8 @@ export const postOnboarding = z.object({
         description: z.string().min(1, "Step description is required"),
         order: z.number().int().min(0, "Order must be a non-negative integer"),
         checklistId: z.number().optional().nullable(),
-        value: z.string().optional().nullable()
+        value: z.string().optional().nullable(),
+        duration: z.number().int().min(0, "Duration must be a non-negative integer").default(0)
     })),
     userId: z.string()
 })
@@ -29,7 +30,8 @@ export const putOnboarding = z.object({
         description: z.string().min(1, "Step description is required"),
         order: z.number().int().min(0, "Order must be a non-negative integer"),
         checklistId: z.number().optional().nullable(),
-        value: z.string().optional().nullable()
+        value: z.string().optional().nullable(),
+        duration: z.number().int().min(0, "Duration must be a non-negative integer").default(0)
     })),
     userId: z.string()
 })

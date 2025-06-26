@@ -76,7 +76,8 @@ export const onboardingRouter = router({
                     order: step.order,
                     type: step.type,
                     checklistId: step.checklistId ?? null,
-                    value: step.value
+                    value: step.value,
+                    duration: step.duration ?? 0
                 }
             });
 
@@ -139,7 +140,7 @@ export const onboardingRouter = router({
             const updatedOnboarding = await tx.update(onboarding).set({
                 description: input.description,
                 title: input.title
-            }).returning()
+            }).where(eq(onboarding.id, input.onBoardingId)).returning()
 
             const existingSteps = await tx
                 .select()
@@ -163,7 +164,8 @@ export const onboardingRouter = router({
                     order: step.order,
                     type: step.type,
                     checklistId: step.checklistId ?? null,
-                    value: step.value
+                    value: step.value,
+                    duration: step.duration ?? 0
                 }
             });
 
@@ -178,10 +180,12 @@ export const onboardingRouter = router({
                         order: stepToUpdate.order,
                         type: stepToUpdate.type,
                         checklistId: stepToUpdate.checklistId,
-                        value: stepToUpdate.value
+                        value: stepToUpdate.value,
+                        duration: stepToUpdate.duration ?? 0
                     }).where(eq(step.id, stepToUpdate.id)).returning()
 
                 } else {
+                    console.log("Inserting new step:", stepToUpdate);
                     tmp = await tx.insert(step).values({
                         onboardingId: updatedOnboarding[0].id,
                         title: stepToUpdate.title,
@@ -189,7 +193,8 @@ export const onboardingRouter = router({
                         order: stepToUpdate.order,
                         type: stepToUpdate.type,
                         checklistId: stepToUpdate.checklistId ?? null,
-                        value: stepToUpdate.value
+                        value: stepToUpdate.value,
+                        duration: stepToUpdate.duration ?? 0
                     }).returning()
 
                 }
@@ -214,8 +219,6 @@ export const onboardingRouter = router({
             .where(eq(onboarding.organizationId, input.organizationId))
             .limit(input.limit)
             .offset(input.offset);
-
-        console.log("Onboardings found:", onboardings);
 
         return onboardings;
     }),

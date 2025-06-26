@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, use, useEffect, useState } from "react";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import StepForm from "./step-form";
@@ -15,7 +15,7 @@ export type RawStep = {
     order: number;
     type: "document" | "video" | "checklist";
     checklistId?: number | null;
-    duration?: number;
+    duration: number;
     value?: string | null;
 };
 
@@ -34,7 +34,7 @@ export default function StepEditor({ steps, setSteps }: Props) {
             description: "",
             order: steps.length + 1,
             type: "document",
-            duration: 2,
+            duration: 0,
             checklistId: undefined,
         };
         setSteps([...steps, newStep]);
@@ -63,9 +63,18 @@ export default function StepEditor({ steps, setSteps }: Props) {
 
     function removeStep(index: number) {
         const newSteps = steps.filter((_, i) => i !== index);
+
+        newSteps.forEach((step, i) => {
+            step.order = i + 1;
+        });
+
         setSteps(newSteps)
         setStepToEdit(undefined)
     }
+
+    useEffect(() => {
+        console.log("Steps updated:", steps);
+    }, [steps]);
 
     return (
         <div className="w-full grid grid-cols-12 gap-4">

@@ -44,6 +44,7 @@ export default function Stepper({ current, onboarding, setCurrent, member, onCom
   }
 
   function handleComplete() {
+    console.log("Handling complete for stepper", responses);
     if (!responses) return;
 
     const lastStep = steps[current - 1];
@@ -71,9 +72,14 @@ export default function Stepper({ current, onboarding, setCurrent, member, onCom
 
     if (!lastStep) return;
 
-    if (current > 1 && responses && !responses[lastStep.id]) {
-      const updatedResponses = getUpdatedResponses(lastStep.id, { completed: true });
-      setResponses(updatedResponses);
+    if (current > 1) {
+      if (responses && !responses[lastStep.id]) {
+        const updatedResponses = getUpdatedResponses(lastStep.id, { completed: true });
+        setResponses(updatedResponses);
+      } else if (!responses) {
+        setResponses({ [lastStep.id]: { completed: true } });
+      }
+
     }
   }, [current]);
 
@@ -81,12 +87,19 @@ export default function Stepper({ current, onboarding, setCurrent, member, onCom
     if (!responses) return;
 
     if (!didMount.current) {
-      const lastUncompletedStep = getLastUncompletedStep(responses);
-      if (lastUncompletedStep > 0) {
-        setCurrent(steps[lastUncompletedStep + 1] ? lastUncompletedStep + 1 : lastUncompletedStep);
+      const hasOneResponse = Object.keys(responses).length === 1;
+      if (!hasOneResponse) {
+        const lastUncompletedStep = getLastUncompletedStep(responses);
+        if (lastUncompletedStep > 0) {
+          setCurrent(steps[lastUncompletedStep + 1] ? lastUncompletedStep + 1 : lastUncompletedStep);
+        }
       }
+
       didMount.current = true;
-      return;
+      if (!hasOneResponse) {
+        return;
+      }
+
     }
 
     updateOrCreateMutation.mutate({
