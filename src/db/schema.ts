@@ -1,4 +1,5 @@
-import { pgTable, text, timestamp, boolean, serial } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, pgEnum, integer, check, serial, jsonb } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const user = pgTable("user", {
 	id: text('id').primaryKey(),
@@ -75,6 +76,49 @@ export const invitation = pgTable("invitation", {
 	inviterId: text('inviter_id').notNull().references(() => user.id, { onDelete: 'cascade' })
 });
 
+export const onboarding = pgTable("onboarding", {
+	id: serial('id').primaryKey(),
+	organizationId: text('organization_id').notNull().references(() => organization.id, { onDelete: 'cascade' }),
+	title: text('title').notNull(),
+	description: text('description').notNull(),
+});
+
+export const stepsTypes = pgEnum('steps_types', ['document', 'video', 'checklist']);
+
+export const checklist = pgTable("checklist", {
+	id: serial('id').primaryKey(),
+	answers: jsonb('answers').notNull(),
+});
+
+export const step = pgTable(
+	"step",
+	{
+		id: serial('id').primaryKey(),
+		onboardingId: integer('onboardingId').notNull().references(() => onboarding.id, { onDelete: 'cascade' }),
+		title: text('title').notNull(),
+		description: text('description').notNull(),
+		order: integer('order').notNull(),
+		type: stepsTypes().notNull(),
+		checklistId: integer('checklistId').references(() => checklist.id, { onDelete: 'set null' }),
+		value: text('value'),
+		duration: integer('duration').default(0).notNull(),
+	},
+	(table) => [
+		check('checklist_id_not_null_check', sql`(${table.type} <> 'checklist' OR ${table.checklistId} IS NOT NULL)`)
+	]
+);
+
+export const onboardingResponse = pgTable("onboarding_response", {
+	id: serial('id').primaryKey(),
+	onboardingId: integer('onboardingId').notNull().references(() => onboarding.id, { onDelete: 'cascade' }),
+	memberId: text('memberId').notNull().references(() => member.id, { onDelete: 'cascade' }),
+	value: jsonb('value').notNull(),
+	createdAt: timestamp('createdAt').notNull().$defaultFn(() => /* @__PURE__ */ new Date()),
+	updatedAt: timestamp('updatedAt').notNull().$defaultFn(() => /* @__PURE__ */ new Date()),
+	completed: boolean('completed').$defaultFn(() => false).notNull(),
+});
+
+
 export const resources = pgTable("resources", {
 	id: serial('id').primaryKey(),
 	organizationId: text('organization_id').notNull().references(() => organization.id, { onDelete: 'cascade' }),
@@ -84,3 +128,7 @@ export const resources = pgTable("resources", {
 	createdAt: timestamp('created_at').notNull().$defaultFn(() => /* @__PURE__ */ new Date()),
 	size: text("size")
 });
+
+
+
+export type Step = typeof step.$inferSelect;

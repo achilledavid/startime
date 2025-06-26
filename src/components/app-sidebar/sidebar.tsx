@@ -4,15 +4,14 @@ import {
   Home,
   Users,
   Route,
-  FolderOpen,
   Edit,
-  Eye,
   FileText,
   Palette,
   Building,
   Settings,
   BookOpen,
   LucideIcon,
+  Folders,
 } from "lucide-react"
 
 
@@ -66,7 +65,7 @@ const menuItems: MenuItem[] = [
       {
         title: "See all",
         url: "/admin/onboardings",
-        icon: FolderOpen,
+        icon: Folders,
         requiredRoles: ["owner"],
       },
       {
@@ -75,12 +74,12 @@ const menuItems: MenuItem[] = [
         icon: Edit,
         requiredRoles: ["owner"],
       },
-      {
-        title: "Preview mode",
-        url: "/admin/onboardings/preview",
-        icon: Eye,
-        requiredRoles: ["owner"],
-      },
+      // {
+      //   title: "Preview mode",
+      //   url: "/admin/onboardings/preview",
+      //   icon: Eye,
+      //   requiredRoles: ["owner"],
+      // },
       {
         title: "My onboarding",
         url: "/onboarding",
