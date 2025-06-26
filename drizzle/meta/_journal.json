@@ -43,6 +43,13 @@
       "when": 1750901107340,
       "tag": "0005_tricky_mathemanic",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1750968214488,
+      "tag": "0006_furry_chronomancer",
+      "breakpoints": true
     }
   ]
 }
