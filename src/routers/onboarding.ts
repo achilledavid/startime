@@ -70,7 +70,6 @@ export const onboardingRouter = router({
             }).returning();
 
             const stepsToInsert = input.steps.map(function (step) {
-                // TODO: introduce file upload
                 return {
                     onboardingId: newOnboarding.id,
                     title: step.title,
@@ -78,7 +77,7 @@ export const onboardingRouter = router({
                     order: step.order,
                     type: step.type,
                     checklistId: step.checklistId ?? null,
-                    value: step.value instanceof File ? '' : step.value
+                    value: step.value
                 }
             });
 
@@ -145,8 +144,6 @@ export const onboardingRouter = router({
             }).returning()
 
             const stepsToUpdate = input.steps.map(function (step) {
-                // TODO: introduce file upload
-
                 return {
                     id: step.id,
                     title: step.title,
@@ -154,7 +151,7 @@ export const onboardingRouter = router({
                     order: step.order,
                     type: step.type,
                     checklistId: step.checklistId ?? null,
-                    value: step.value instanceof File ? '' : step.value
+                    value: step.value
                 }
             });
 

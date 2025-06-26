@@ -26,15 +26,13 @@ const formSchema = z.object({
         description: z.string().min(1, "Step description is required"),
         order: z.number().int().min(0, "Order must be a non-negative integer"),
         checklistId: z.number().optional().nullable(),
-        value: z.string().or(z.instanceof(File)).optional().nullable()
+        value: z.string().optional().nullable()
     }))
 })
 
 export default function OnboardingForm({ onboarding }: OnboardingFormProps) {
     const { data: member } = useActiveMember()
     const [steps, setSteps] = useState<RawStep[]>(onboarding?.steps || []);
-
-    console.log(onboarding?.steps)
 
     const createOnboarding = trpc.onboarding.post.useMutation()
     const updateOnboarding = trpc.onboarding.put.useMutation();

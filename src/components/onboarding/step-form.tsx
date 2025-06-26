@@ -32,7 +32,7 @@ function StepForm({ step, onUpdate, index }: StepFormProps) {
         onUpdate(index, { ...stepData, value });
     };
 
-    function handleSpecificFileFieldUpdate(value: File | null) {
+    function handleSpecificFileFieldUpdate(value: string) {
         if (!value) {
             setStepData({ ...stepData, value: '' });
             onUpdate(index, { ...stepData, value: '' });

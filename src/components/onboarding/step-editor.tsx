@@ -13,7 +13,7 @@ export type RawStep = {
     type: "document" | "video" | "checklist";
     checklistId?: number | null;
     duration?: number;
-    value?: string | File | null;
+    value?: string | null;
 };
 
 type Props = {
