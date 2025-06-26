@@ -12,7 +12,6 @@ import { trpc } from "@/app/_trpc/client";
 import { useActiveMember } from "@/lib/auth-client";
 import { useEffect, useState } from "react";
 import { Textarea } from "../ui/textarea";
-import { redirect } from "next/navigation";
 
 type OnboardingFormProps = {
     onboarding?: Onboarding;
