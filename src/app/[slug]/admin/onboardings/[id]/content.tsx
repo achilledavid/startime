@@ -3,7 +3,7 @@ import { trpc } from "@/app/_trpc/client";
 import OnboardingForm from "@/components/onboarding/form";
 import { Loader2 } from "lucide-react";
 
-export default function Content({ onboardingId }: { onboardingId: string }) {
+export default function Content({ onboardingId }: { onboardingId: number }) {
     const { data: onboarding, isPending } = trpc.onboarding.get.useQuery({ onboardingId: onboardingId });
 
     if (isPending) {

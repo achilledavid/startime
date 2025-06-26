@@ -2,10 +2,11 @@
 import { trpc } from "@/app/_trpc/client";
 import { Button } from "@/components/ui/button";
 import { useActiveMember } from "@/lib/auth-client";
+import { Organization } from "better-auth/plugins/organization";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 
-export default function Content({ organization }) {
+export default function Content({ organization }: { organization: Organization }) {
     const { data: activeMember, isPending: isMemberPending } = useActiveMember();
     const { data: onboardings, isPending, refetch } = trpc.onboarding.getAll.useQuery({
         organizationId: organization.id,

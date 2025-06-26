@@ -111,6 +111,7 @@ export const onboardingResponse = pgTable("onboarding_response", {
 	id: serial('id').primaryKey(),
 	onboardingId: integer('onboardingId').notNull().references(() => onboarding.id, { onDelete: 'cascade' }),
 	memberId: text('memberId').notNull().references(() => member.id, { onDelete: 'cascade' }),
+	value: jsonb('value').notNull(),
 	createdAt: timestamp('createdAt').notNull().$defaultFn(() => /* @__PURE__ */ new Date()),
 	updatedAt: timestamp('updatedAt').notNull().$defaultFn(() => /* @__PURE__ */ new Date()),
 	completed: boolean('completed').$defaultFn(() => false).notNull(),

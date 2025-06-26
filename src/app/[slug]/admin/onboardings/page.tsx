@@ -7,6 +7,10 @@ export default async function Page() {
         headers: await headers()
     })
 
+    if (!organization) {
+        return <div className="p-8 w-full h-full">No organization found.</div>;
+    }
+
     return (
         <div className="p-8 w-full h-full">
             <Content organization={organization} />

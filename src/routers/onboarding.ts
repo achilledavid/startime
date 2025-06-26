@@ -1,9 +1,9 @@
-import { member as memberSchema, onboarding, Step, step } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { member as memberSchema, onboarding, onboardingResponse, Step, step } from '@/db/schema';
+import { and, eq } from 'drizzle-orm';
 import { db } from "@/db";
 import { publicProcedure, router } from "@/server/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
-import { deleteOnboarding, getAllOnboardings, getOnboarding, postOnboarding, putOnboarding } from '@/schemas/onboarding';
+import { deleteOnboarding, getAllOnboardings, getOnboarding, getResponses, getUserOnboarding, postOnboarding, postResponse, putOnboarding } from '@/schemas/onboarding';
 
 export const onboardingRouter = router({
     get: publicProcedure.input(getOnboarding).query(async (opts) => {
@@ -63,14 +63,13 @@ export const onboardingRouter = router({
         }
 
         const transaction = await db.transaction(async (tx) => {
-            console.log(input, member)
             const [newOnboarding] = await tx.insert(onboarding).values({
                 organizationId: member[0].organizationId,
                 title: input.title,
                 description: input.description,
             }).returning();
 
-            const stepsToInsert = input.steps.map(function (step, index) {
+            const stepsToInsert = input.steps.map(function (step) {
                 // TODO: introduce file upload
                 return {
                     onboardingId: newOnboarding.id,
@@ -145,7 +144,7 @@ export const onboardingRouter = router({
                 title: input.title
             }).returning()
 
-            const stepsToUpdate = input.steps.map(function (step, index) {
+            const stepsToUpdate = input.steps.map(function (step) {
                 // TODO: introduce file upload
 
                 return {
@@ -249,7 +248,168 @@ export const onboardingRouter = router({
         }
 
         return deletedOnboarding[0];
-    })
+    }),
+
+    getUserOnboarding: publicProcedure.input(getUserOnboarding).query(async (opts) => {
+        const { input } = opts;
+
+        const member = await db
+            .select()
+            .from(memberSchema)
+            .where(eq(memberSchema.id, input.userId))
+            .limit(1);
+
+        if (!member[0]) {
+            throw new TRPCError({
+                code: "UNAUTHORIZED",
+                message: "User is not authenticated"
+            });
+        }
+
+        const onboardingData = await db
+            .select()
+            .from(onboarding)
+            .where(eq(onboarding.organizationId, member[0].organizationId))
+            .limit(1);
+
+        if (onboardingData.length === 0) {
+            throw new TRPCError({
+                code: "NOT_FOUND",
+                message: "Onboarding not found"
+            });
+        }
+
+        const stepsData = await db
+            .select()
+            .from(step)
+            .where(eq(step.onboardingId, onboardingData[0].id))
+            .orderBy(step.order);
+
+        return {
+            data: onboardingData[0],
+            steps: stepsData,
+        }
+    }),
+
+    postResponse: publicProcedure.input(postResponse).mutation(async (opts) => {
+        const { input } = opts;
+
+        const member = await db
+            .select()
+            .from(memberSchema)
+            .where(eq(memberSchema.userId, input.userId))
+            .limit(1);
+
+        if (!member[0]) {
+            throw new TRPCError({
+                code: "UNAUTHORIZED",
+                message: "User is not authenticated"
+            });
+        }
+
+        const existingResponses = await db
+            .select()
+            .from(onboardingResponse)
+            .where(and(
+                eq(onboardingResponse.onboardingId, input.onboardingId),
+                eq(onboardingResponse.memberId, member[0].id)
+            ))
+            .limit(1);
+
+        if (existingResponses.length > 0) {
+            throw new TRPCError({
+                code: "BAD_REQUEST",
+                message: "Responses for this onboarding already exist"
+            });
+        }
+
+        const responses = await db.insert(onboardingResponse).values({
+            value: input.responses,
+            onboardingId: input.onboardingId,
+            memberId: member[0].id,
+            completed: input.completed
+        }).returning()
+
+        return responses[0];
+    }),
+
+    putResponse: publicProcedure.input(postResponse).mutation(async (opts) => {
+        const { input } = opts;
+
+        const member = await db
+            .select()
+            .from(memberSchema)
+            .where(eq(memberSchema.userId, input.userId))
+            .limit(1);
+
+        if (!member[0]) {
+            throw new TRPCError({
+                code: "UNAUTHORIZED",
+                message: "User is not authenticated"
+            });
+        }
+
+        const existingResponses = await db
+            .select()
+            .from(onboardingResponse)
+            .where(and(
+                eq(onboardingResponse.onboardingId, input.onboardingId),
+                eq(onboardingResponse.memberId, member[0].id)
+            ))
+            .limit(1);
+
+        if (existingResponses.length === 0) {
+            throw new TRPCError({
+                code: "NOT_FOUND",
+                message: "Responses for this onboarding not found"
+            });
+        }
+
+        const updatedResponses = await db.update(onboardingResponse).set({
+            value: input.responses,
+            completed: input.completed
+        }).where(and(
+            eq(onboardingResponse.onboardingId, input.onboardingId),
+            eq(onboardingResponse.memberId, member[0].id)
+        )).returning()
+
+        return updatedResponses[0];
+    }),
+
+    getResponses: publicProcedure.input(getResponses).query(async (opts) => {
+        const { input } = opts;
+
+        const member = await db
+            .select()
+            .from(memberSchema)
+            .where(eq(memberSchema.userId, input.userId))
+            .limit(1);
+
+        if (!member[0]) {
+            throw new TRPCError({
+                code: "UNAUTHORIZED",
+                message: "User is not authenticated"
+            });
+        }
+
+        const responses = await db
+            .select()
+            .from(onboardingResponse)
+            .where(and(
+                eq(onboardingResponse.onboardingId, input.onboardingId),
+                eq(onboardingResponse.memberId, member[0].id)
+            ))
+            .limit(1);
+
+        if (responses.length === 0) {
+            throw new TRPCError({
+                code: "NOT_FOUND",
+                message: "Responses for this onboarding not found"
+            });
+        }
+
+        return responses[0];
+    }),
 });
 
 type RouterOutput = inferRouterOutputs<typeof onboardingRouter>;

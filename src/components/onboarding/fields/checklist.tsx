@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, Trash2, Save } from "lucide-react"
 import { trpc } from "@/app/_trpc/client"
+import { AnswersFromChecklist } from "../render"
 
 export interface ChecklistItem {
     id: string
@@ -22,7 +23,7 @@ interface ChecklistCreatorProps {
 }
 
 export default function ChecklistField({ checklistId, className, onCreate }: ChecklistCreatorProps) {
-    const { data, isPending, refetch } = trpc.checklist.get.useQuery({ id: checklistId || -1 }, {
+    const { data, isPending } = trpc.checklist.get.useQuery({ id: checklistId || -1 }, {
         retry: false,
     })
     const [items, setItems] = useState<ChecklistItem[]>([])
@@ -88,7 +89,8 @@ export default function ChecklistField({ checklistId, className, onCreate }: Che
     useEffect(() => {
         if (checklistId && !isPending) {
             if (data && data.data.answers) {
-                setItems(data.data.answers.map((item: ChecklistItem) => ({
+                const answers: AnswersFromChecklist = data.data.answers as AnswersFromChecklist;
+                setItems(answers.map((item: ChecklistItem) => ({
                     id: item.id,
                     text: item.text,
                 })))

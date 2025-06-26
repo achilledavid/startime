@@ -36,6 +36,13 @@
       "when": 1750761112856,
       "tag": "0004_spooky_squadron_supreme",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1750901107340,
+      "tag": "0005_tricky_mathemanic",
+      "breakpoints": true
     }
   ]
 }

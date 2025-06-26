@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { RawStep } from './step-editor';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';

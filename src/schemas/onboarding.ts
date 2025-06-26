@@ -1,7 +1,7 @@
 import z from "zod";
 
 export const getOnboarding = z.object({
-    onboardingId: z.string(),
+    onboardingId: z.number(),
 });
 
 export const postOnboarding = z.object({
@@ -43,4 +43,29 @@ export const getAllOnboardings = z.object({
 export const deleteOnboarding = z.object({
     onboardingId: z.number(),
     userId: z.string(),
+});
+
+export const getUserOnboarding = z.object({
+    userId: z.string(),
+});
+
+export const postResponse = z.object({
+    userId: z.string(),
+    onboardingId: z.number(),
+    responses: z.record(z.object({
+        completed: z.boolean(),
+        answers: z.array(
+            z.object({
+                id: z.string(),
+                text: z.string(),
+                isChecked: z.boolean().optional().default(false),
+            })
+        ).optional().default([]),
+    })),
+    completed: z.boolean().optional().default(false),
+});
+
+export const getResponses = z.object({
+    userId: z.string(),
+    onboardingId: z.number(),
 });
