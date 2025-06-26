@@ -413,6 +413,49 @@ export const onboardingRouter = router({
 
         return responses[0];
     }),
+
+    updateOrCreateResponse: publicProcedure.input(postResponse).mutation(async (opts) => {
+        const { input } = opts;
+
+        const member = await db
+            .select()
+            .from(memberSchema)
+            .where(eq(memberSchema.userId, input.userId))
+            .limit(1);
+
+        if (!member[0]) {
+            throw new TRPCError({
+                code: "UNAUTHORIZED",
+                message: "User is not authenticated"
+            });
+        }
+
+        const existingResponses = await db
+            .select()
+            .from(onboardingResponse)
+            .where(and(
+                eq(onboardingResponse.onboardingId, input.onboardingId),
+                eq(onboardingResponse.memberId, member[0].id)
+            ))
+            .limit(1);
+
+        if (existingResponses.length > 0) {
+            return await db.update(onboardingResponse).set({
+                value: input.responses,
+                completed: input.completed
+            }).where(and(
+                eq(onboardingResponse.onboardingId, input.onboardingId),
+                eq(onboardingResponse.memberId, member[0].id)
+            )).returning();
+        } else {
+            return await db.insert(onboardingResponse).values({
+                value: input.responses,
+                onboardingId: input.onboardingId,
+                memberId: member[0].id,
+                completed: input.completed
+            }).returning();
+        }
+    })
 });
 
 type RouterOutput = inferRouterOutputs<typeof onboardingRouter>;

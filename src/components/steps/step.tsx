@@ -5,7 +5,37 @@ import { FileText, Video, CheckSquare, HelpCircle } from "lucide-react";
 import VideoStep from "./video";
 import ChecklistStep from "./checklist";
 
-export default function Step({ step }: { step: Onboarding["steps"][number] }) {
+export type CheckboxValue = Set<string>;
+
+export type CheckboxResponse = {
+  completed: boolean;
+  value: string[];
+}
+
+export type Value = {
+  completed: boolean;
+}
+
+export type PossibleValue = Value | CheckboxResponse;
+
+export default function Step({ step, onUpdate, value }: { step: Onboarding["steps"][number], onUpdate: (stepId: number, value: PossibleValue) => void, value: PossibleValue | undefined }) {
+
+  function handleCheckboxUpdate(value: { completed: boolean, value: string[] }) {
+    onUpdate(step.id, value);
+  }
+
+  function renderStepContent(step: Onboarding["steps"][number]) {
+    switch (step.type) {
+      case "document":
+        return <DocumentStep step={step} />
+      case "video":
+        return <VideoStep step={step} />
+      case "checklist":
+        return <ChecklistStep step={step} onUpdate={handleCheckboxUpdate} value={value as CheckboxResponse} />
+      default:
+        return <p>Unknown step type: {step.type}</p>
+    }
+  }
 
   const StepIcon = getStepIcon(step.type);
 
@@ -25,19 +55,6 @@ export default function Step({ step }: { step: Onboarding["steps"][number] }) {
       </CardContent>
     </Card>
   )
-}
-
-function renderStepContent(step: Onboarding["steps"][number]) {
-  switch (step.type) {
-    case "document":
-      return <DocumentStep step={step} />
-    case "video":
-      return <VideoStep step={step} />
-    case "checklist":
-      return <ChecklistStep step={step} />
-    default:
-      return <p>Unknown step type: {step.type}</p>
-  }
 }
 
 export function getStepIcon(type: string) {

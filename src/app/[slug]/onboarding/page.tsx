@@ -9,22 +9,32 @@ import { Button } from "@/components/ui/button";
 import { Clock, ArrowRight, Loader2, ListCheck, CheckCircle } from "lucide-react";
 import { parseAsInteger, useQueryState } from 'nuqs'
 import Stepper from "../../../components/steps/stepper";
+import { PossibleValue } from "@/components/steps/step";
+
+export type Responses = Record<number, PossibleValue>;
 
 export default function Onboarding() {
     const [step, setStep] = useQueryState('step', parseAsInteger.withDefault(0))
     const [completed, setCompleted] = useState(false);
+    const [responses, setResponses] = useState<Responses | null>(null);
 
     const { data: member } = useActiveMember()
     const { data: onboarding, isPending } = trpc.onboarding.getUserOnboarding.useQuery({ userId: member?.id || "", }, { enabled: !!member, retry: false });
 
-    const { data: initialResponses, refetch: refetchResponses } = trpc.onboarding.getResponses.useQuery({
+    const { data: initialResponses, refetch: refetchResponses, isPending: isPendingResponses } = trpc.onboarding.getResponses.useQuery({
         userId: member?.userId || "",
         onboardingId: onboarding?.data.id || 0,
-    }, { enabled: !!member || !!onboarding });
+    }, {
+        enabled: !!member && !!onboarding, retry: false
+    });
+
+
+
 
     useEffect(() => {
         if (!initialResponses) return;
         setCompleted(initialResponses.completed);
+        setResponses(initialResponses?.value as PossibleValue || {});
     }, [initialResponses])
 
     // TODO: get duration from db
@@ -84,7 +94,7 @@ export default function Onboarding() {
                 onboarding ? (
                     step !== 0 ? (
                         <div className="p-4">
-                            <Stepper current={step} setCurrent={setStep} onboarding={onboarding} member={member} onComplete={onComplete} />
+                            <Stepper current={step} setCurrent={setStep} onboarding={onboarding} member={member} onComplete={onComplete} setResponses={setResponses} responses={responses} isPendingResponses={isPendingResponses} />
                         </div>
                     ) : (
                         <div className="p-4 max-w-2xl">
@@ -120,7 +130,7 @@ export default function Onboarding() {
                                         className="w-full"
                                         onClick={() => setStep(1)}
                                     >
-                                        Get started
+                                        {completed ? "See my onboarding" : "Get started"}
                                         <ArrowRight />
                                     </Button>
                                 </CardContent>

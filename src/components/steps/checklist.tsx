@@ -3,15 +3,38 @@ import { Loader2 } from "lucide-react";
 import { trpc } from "@/app/_trpc/client";
 import { AnswersFromChecklist } from "../onboarding/render";
 import { Checkbox } from "../ui/checkbox";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { CheckboxResponse } from "./step";
 
-export default function ChecklistStep({ step }: { step: Onboarding["steps"][number] }) {
+export default function ChecklistStep({ step, onUpdate, value }: { step: Onboarding["steps"][number], onUpdate: (value: { completed: boolean, value: string[] }) => void, value: CheckboxResponse | undefined }) {
   const { data, isPending } = trpc.checklist.get.useQuery({ id: step?.checklistId || 0 }, { enabled: !!step.checklistId });
-  const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
+  const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set(value?.value));
+  const answers: AnswersFromChecklist = data?.data.answers as AnswersFromChecklist;
+  const hasSetInitialValue = useRef(false);
+
+  useEffect(() => {
+    if (!answers) return;
+
+    const isCompleted = answers.every(answer => checkedItems.has(answer.id));
+
+    onUpdate({
+      completed: isCompleted,
+      value: Array.from(checkedItems)
+    });
+  }, [checkedItems]);
+
+  useEffect(() => {
+    if (!value) return;
+
+    if (hasSetInitialValue.current) return;
+
+    hasSetInitialValue.current = true;
+
+    const initialCheckedItems = new Set(value.value);
+    setCheckedItems(initialCheckedItems);
+  }, [value]);
 
   if (!data) return
-
-  const answers: AnswersFromChecklist = data.data.answers as AnswersFromChecklist;
 
   if (isPending) return <div className="min-h-40 flex items-center justify-center"><Loader2 className="size-4 animate-spin" /></div>
 
@@ -29,6 +52,7 @@ export default function ChecklistStep({ step }: { step: Onboarding["steps"][numb
     <div className="space-y-3">
       {answers.map((answer) => {
         const isChecked = checkedItems.has(answer.id);
+
         return (
           <div
             key={answer.id}

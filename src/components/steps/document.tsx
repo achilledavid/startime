@@ -4,6 +4,7 @@ import { Download } from "lucide-react";
 import Link from "next/link";
 
 export default function DocumentStep({ step }: { step: Onboarding["steps"][number] }) {
+  if (!step.value) return null;
   return (
     <div className="space-y-4">
       <Button

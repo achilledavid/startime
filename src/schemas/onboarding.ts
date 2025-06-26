@@ -54,13 +54,7 @@ export const postResponse = z.object({
     onboardingId: z.number(),
     responses: z.record(z.object({
         completed: z.boolean(),
-        answers: z.array(
-            z.object({
-                id: z.string(),
-                text: z.string(),
-                isChecked: z.boolean().optional().default(false),
-            })
-        ).optional().default([]),
+        value: z.array(z.string()).optional().default([])
     })),
     completed: z.boolean().optional().default(false),
 });
