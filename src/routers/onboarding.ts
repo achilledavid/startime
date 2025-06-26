@@ -40,7 +40,6 @@ export const onboardingRouter = router({
     }),
 
     post: publicProcedure.input(postOnboarding).mutation(async (opts) => {
-
         const { input } = opts;
         const member = await db
             .select()
@@ -99,7 +98,6 @@ export const onboardingRouter = router({
         return transaction
 
     }),
-
     put: publicProcedure.input(putOnboarding).mutation(async (opts) => {
         const { input } = opts;
         const member = await db
@@ -193,7 +191,6 @@ export const onboardingRouter = router({
 
         return transaction
     }),
-
     getAll: publicProcedure.input(getAllOnboardings).query(async (opts) => {
         const { input } = opts;
 
@@ -208,7 +205,6 @@ export const onboardingRouter = router({
 
         return onboardings;
     }),
-
     delete: publicProcedure.input(deleteOnboarding).mutation(async (opts) => {
         const { input } = opts;
 
@@ -246,7 +242,6 @@ export const onboardingRouter = router({
 
         return deletedOnboarding[0];
     }),
-
     getUserOnboarding: publicProcedure.input(getUserOnboarding).query(async (opts) => {
         const { input } = opts;
 
@@ -287,7 +282,6 @@ export const onboardingRouter = router({
             steps: stepsData,
         }
     }),
-
     postResponse: publicProcedure.input(postResponse).mutation(async (opts) => {
         const { input } = opts;
 
@@ -329,7 +323,6 @@ export const onboardingRouter = router({
 
         return responses[0];
     }),
-
     putResponse: publicProcedure.input(postResponse).mutation(async (opts) => {
         const { input } = opts;
 
@@ -372,7 +365,6 @@ export const onboardingRouter = router({
 
         return updatedResponses[0];
     }),
-
     getResponses: publicProcedure.input(getResponses).query(async (opts) => {
         const { input } = opts;
 
