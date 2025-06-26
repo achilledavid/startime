@@ -1,8 +1,11 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import StepForm from "./step-form";
-import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, MoreVertical, Plus, Trash, Trash2 } from "lucide-react";
+import { getStepIcon } from "../steps/step";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
 export type RawStep = {
     id?: number;
@@ -22,25 +25,26 @@ type Props = {
 };
 
 export default function StepEditor({ steps, setSteps }: Props) {
-    const [stepToEdit, setStepToEdit] = useState<RawStep | null>(null);
+    const [stepToEdit, setStepToEdit] = useState<RawStep>();
 
     function newStep() {
-        const newStep: RawStep = {
-            title: "New step title",
-            description: "New step description",
-            order: steps.length + 1,
-            type: "document",
-            duration: 0,
-            checklistId: undefined,
-        };
-        setSteps([...steps, newStep]);
+        // const newStep: RawStep = {
+        //     id: undefined,
+        //     title: "",
+        //     description: "",
+        //     order: steps.length + 1,
+        //     type: "document",
+        //     duration: 2,
+        //     checklistId: undefined,
+        // };
+        // setSteps([...steps, newStep]);
     }
 
     function updateStep(index: number, updatedStep: RawStep) {
-        const newSteps = [...steps];
-        newSteps[index] = updatedStep;
-        setSteps(newSteps);
-        setStepToEdit(updatedStep);
+        // const newSteps = [...steps];
+        // newSteps[index] = updatedStep;
+        // setSteps(newSteps);
+        // setStepToEdit(updatedStep);
     }
 
     function moveStep(index: number, direction: "up" | "down") {
@@ -55,96 +59,80 @@ export default function StepEditor({ steps, setSteps }: Props) {
     }
 
     function removeStep(index: number) {
-        const newSteps = steps.filter((_, i) => i !== index);
-        setSteps(newSteps);
-        setStepToEdit(null)
+        // const newSteps = steps.filter((_, i) => i !== index);
+        // setSteps(newSteps)
+        setStepToEdit(undefined)
     }
 
-    useEffect(() => {
-        if (steps.length > 0) {
-            setSteps(steps);
-        } else {
-            newStep();
-        }
-    }, []);
+    // useEffect(() => {
+    //     if (steps.length > 0) {
+    //         setSteps(steps)
+    //     } else {
+    //         newStep();
+    //     }
+    // }, []);
 
     return (
-        <div className="w-full flex gap-8">
-            <Card className="w-1/3 h-full">
+        <div className="w-full grid grid-cols-12 gap-4">
+            <Card className="col-span-4 h-fit">
                 <CardHeader>
-                    <div className="flex w-full justify-between items-center">
-                        <CardTitle>Steps ({steps.length})</CardTitle>
-                        <Button type="button" onClick={newStep}>
-                            New Step
+                    <CardTitle>Steps</CardTitle>
+                    <CardDescription>{steps.length} in total</CardDescription>
+                    <CardAction>
+                        <Button type="button" size="icon" onClick={newStep}>
+                            <Plus />
                         </Button>
-                    </div>
+                    </CardAction>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    {steps.map((step, index) => (
-                        <div
-                            key={step.order}
-                            className={`p-4 rounded-lg border cursor-pointer transition-all hover:shadow-sm ${stepToEdit?.order === step.order
-                                ? "border-blue-500 bg-blue-50 shadow-sm"
-                                : "border-gray-200 hover:border-gray-300"
-                                }`}
-                            onClick={() => setStepToEdit(step)}
-                        >
-                            <div className="flex items-start justify-between">
-                                <div className="flex items-start space-x-3 flex-1">
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-900 mb-1">{step.title}</p>
-                                        <p className="text-xs text-gray-500 mb-2 line-clamp-2">{step.description}</p>
-                                        <p>{step.checklistId}</p>
+                    {steps.map((step, index) => {
+                        const StepIcon = getStepIcon(step.type);
+                        return (
+                            <div
+                                key={step.id + "-" + step.order}
+                                className={cn(
+                                    "p-4 rounded-lg border cursor-pointer flex justify-between items-center gap-4",
+                                    stepToEdit && (stepToEdit.order === step.order) ? "border-primary bg-primary/10 text-primary" : "border-gray-200 text-foreground")
+                                }
+                                onClick={() => setStepToEdit(step)}
+                            >
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-1.5">
+                                        <StepIcon className="size-4" />
+                                        <p className="text-sm font-medium">{step.title || "Untitled step"}</p>
                                     </div>
+                                    {step.description && <p className="text-xs opacity-50 line-clamp-2">{step.description}</p>}
                                 </div>
-                                <div className="flex flex-col space-y-1 ml-2">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-7 w-7 p-0"
-                                        type="button"
-                                        onClick={() => moveStep(index, "up")}
-                                        disabled={index === 0}
-                                    >
-                                        <ChevronUp className="h-3 w-3" />
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-7 w-7 p-0"
-                                        type="button"
-                                        onClick={() => moveStep(index, "down")}
-                                        disabled={index === steps.length - 1}
-                                    >
-                                        <ChevronDown className="h-3 w-3" />
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-7 w-7 p-0"
-                                        type="button"
-                                        onClick={() => removeStep(index)}
-                                    >
-                                        <Trash2 className="h-3 w-3" />
-                                    </Button>
-                                </div>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="icon">
+                                            <MoreVertical className="w-4 h-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={() => moveStep(index, "up")}><ChevronUp />Move up</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => moveStep(index, "down")}><ChevronDown />Move down</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => removeStep(index)} variant="destructive"><Trash />Remove</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
-                        </div>
-                    ))}
+                        )
+                    })}
                 </CardContent>
             </Card>
-            <Card className="w-2/3 h-full">
-                <CardHeader>
-                    <CardTitle>{stepToEdit ? `Step ${stepToEdit.order} : ${stepToEdit.title}` : "Step editing"}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    {stepToEdit ? (
-                        <StepForm key={stepToEdit.order} index={steps.indexOf(stepToEdit)} step={stepToEdit} onUpdate={updateStep} />
-                    ) : (
-                        <p>Select a step</p>
-                    )}
-                </CardContent>
-            </Card>
-        </div >
+            <div className="col-span-8">
+                {stepToEdit ? (
+                    <Card>
+                        <CardContent>
+                            <StepForm key={stepToEdit.order} index={steps.indexOf(stepToEdit)} step={stepToEdit} onUpdate={updateStep} />
+                        </CardContent>
+                    </Card>
+                ) : (
+                    <Card className="flex items-center justify-center h-full">
+                        <p className="text-muted-foreground text-sm">Select a step to start editing!</p>
+                    </Card>
+                )}
+            </div>
+        </div>
     );
 }

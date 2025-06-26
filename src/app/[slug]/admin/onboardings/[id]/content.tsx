@@ -8,14 +8,14 @@ export default function Content({ onboardingId }: { onboardingId: number }) {
 
     if (isPending) {
         return (
-            <div className="flex items-center justify-center h-full">
-                <Loader2 className="animate-spin" />
+            <div className="p-4 flex items-center justify-center min-h-40">
+                <Loader2 className="animate-spin size-4" />
             </div>
         );
     }
 
     return (
-        <div className="p-8 w-full h-full">
+        <div className="p-4">
             <OnboardingForm onboarding={onboarding} />
         </div>
     );

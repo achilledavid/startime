@@ -11,7 +11,7 @@ export default function DocumentStep({ step }: { step: Onboarding["steps"][numbe
         className="w-fit"
         disabled={!step.value}
       >
-        <Link href={step.value!} download>
+        <Link href={step.value!} download target="_blank">
           <Download />
           Download document
         </Link>

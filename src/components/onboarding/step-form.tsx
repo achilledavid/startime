@@ -7,6 +7,7 @@ import { Textarea } from '../ui/textarea';
 import VideoField from './fields/video';
 import DocumentField from './fields/document';
 import ChecklistField from './fields/checklist';
+import { CheckSquare, FileText, Video } from 'lucide-react';
 
 type StepFormProps = {
     step: RawStep;
@@ -49,10 +50,10 @@ function StepForm({ step, onUpdate, index }: StepFormProps) {
     };
 
     return (
-        <div className='w-full space-y-4'>
-            <div className='flex w-full gap-4 items-center '>
-                <div className='w-full space-y-2'>
-                    <Label>Title</Label>
+        <div className='space-y-4'>
+            <div className='flex gap-4'>
+                <div className='w-full'>
+                    <Label className='mb-2'>Title</Label>
                     <Input
                         type="text"
                         name="title"
@@ -60,8 +61,8 @@ function StepForm({ step, onUpdate, index }: StepFormProps) {
                         onChange={handleChange}
                     />
                 </div>
-                <div className='w-full space-y-2'>
-                    <Label>Type</Label>
+                <div className='w-full'>
+                    <Label className='mb-2'>Type</Label>
                     <Select
                         name="type"
                         value={stepData.type}
@@ -71,9 +72,24 @@ function StepForm({ step, onUpdate, index }: StepFormProps) {
                             <SelectValue placeholder="Type" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="document">Document</SelectItem>
-                            <SelectItem value="video">Video</SelectItem>
-                            <SelectItem value="checklist">Checklist</SelectItem>
+                            <SelectItem value="document">
+                                <div className="flex items-center gap-2">
+                                    <FileText className="w-4 h-4" />
+                                    Document
+                                </div>
+                            </SelectItem>
+                            <SelectItem value="video">
+                                <div className="flex items-center gap-2">
+                                    <Video className="w-4 h-4" />
+                                    Video
+                                </div>
+                            </SelectItem>
+                            <SelectItem value="checklist">
+                                <div className="flex items-center gap-2">
+                                    <CheckSquare className="w-4 h-4" />
+                                    Checklist
+                                </div>
+                            </SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -86,18 +102,34 @@ function StepForm({ step, onUpdate, index }: StepFormProps) {
                     onChange={handleChange}
                 />
             </div>
-            {stepData.type === 'video' && (
-                <VideoField
-                    value={typeof stepData.value === 'string' ? stepData.value : ''}
-                    onUpdate={handleSpecificFieldUpdate}
-                />
-            )}
-            {stepData.type === 'document' && (
-                <DocumentField defaultValue={stepData.value && typeof stepData.value === 'string' ? new File([], stepData.value) : null} onUpdate={handleSpecificFileFieldUpdate} />
-            )}
-            {stepData.type === 'checklist' && (
-                <ChecklistField onCreate={handleChecklistCreation} checklistId={stepData?.checklistId} />
-            )}
+            {(() => {
+                switch (stepData.type) {
+                    case 'video':
+                        return (
+                            <VideoField
+                                value={typeof stepData.value === 'string' ? stepData.value : ''}
+                                onUpdate={handleSpecificFieldUpdate}
+                            />
+                        );
+                    case 'document':
+                        return (
+                            <></>
+                            // <DocumentField
+                            //     defaultValue={stepData.value && typeof stepData.value === 'string' ? new File([], stepData.value) : null}
+                            //     onUpdate={handleSpecificFileFieldUpdate}
+                            // />
+                        );
+                    case 'checklist':
+                        return (
+                            <ChecklistField
+                                onCreate={handleChecklistCreation}
+                                checklistId={stepData?.checklistId}
+                            />
+                        );
+                    default:
+                        return null;
+                }
+            })()}
             <div className='w-full space-y-2'>
                 <Label>Duration (minutes)</Label>
                 <Input

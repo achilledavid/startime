@@ -7,25 +7,12 @@ import ChecklistStep from "./checklist";
 
 export default function Step({ step }: { step: Onboarding["steps"][number] }) {
 
-  function getStepIcon(type: string) {
-    switch (type) {
-      case "document":
-        return FileText
-      case "video":
-        return Video
-      case "checklist":
-        return CheckSquare
-      default:
-        return HelpCircle
-    }
-  }
-
   const StepIcon = getStepIcon(step.type);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-1.5">
           <StepIcon className="size-4 text-muted-foreground" />
           {step.title}
         </CardTitle>
@@ -50,5 +37,18 @@ function renderStepContent(step: Onboarding["steps"][number]) {
       return <ChecklistStep step={step} />
     default:
       return <p>Unknown step type: {step.type}</p>
+  }
+}
+
+export function getStepIcon(type: string) {
+  switch (type) {
+    case "document":
+      return FileText
+    case "video":
+      return Video
+    case "checklist":
+      return CheckSquare
+    default:
+      return HelpCircle
   }
 }

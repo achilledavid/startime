@@ -124,7 +124,7 @@ export default function Onboarding() {
                                         <ArrowRight />
                                     </Button>
                                 </CardContent>
-                            </Card >
+                            </Card>
                         </div>
                     )
                 ) : (

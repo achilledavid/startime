@@ -11,12 +11,13 @@ import StepEditor, { RawStep } from "./step-editor";
 import { trpc } from "@/app/_trpc/client";
 import { useActiveMember } from "@/lib/auth-client";
 import { useEffect, useState } from "react";
+import { Textarea } from "../ui/textarea";
 
 type OnboardingFormProps = {
     onboarding?: Onboarding;
 };
 
-const formSchema = z.object({
+export const formSchema = z.object({
     title: z.string().min(1, "Title is required"),
     description: z.string().min(1, "Description is required"),
     steps: z.array(z.object({
@@ -36,6 +37,7 @@ export default function OnboardingForm({ onboarding }: OnboardingFormProps) {
 
     const createOnboarding = trpc.onboarding.post.useMutation()
     const updateOnboarding = trpc.onboarding.put.useMutation();
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -45,24 +47,21 @@ export default function OnboardingForm({ onboarding }: OnboardingFormProps) {
     })
 
     function handleSubmit(data: z.infer<typeof formSchema>) {
-        if (!member) {
-            console.error("User is not authenticated");
-            return;
-        }
+        if (!member) return
 
         if (onboarding) {
             updateOnboarding.mutate({
                 onBoardingId: onboarding.data.id,
                 title: data.title,
                 description: data.description,
-                steps: data.steps || [],
+                steps: data.steps,
                 userId: member.userId
             });
         } else {
             createOnboarding.mutate({
                 title: data.title,
                 description: data.description,
-                steps: data.steps || [],
+                steps: data.steps,
                 userId: member.userId
             });
 
@@ -71,16 +70,14 @@ export default function OnboardingForm({ onboarding }: OnboardingFormProps) {
         }
     }
 
-    useEffect(() => {
-        form.setValue("steps", steps);
-    }, [steps]);
+    // useEffect(() => {
+    //     form.setValue("steps", steps);
+    // }, [steps]);
 
     return (
-        <div className="w-full">
-            <h1 className="text-2xl font-bold mb-4">{onboarding ? "Edit" : "Create"} Onboarding</h1>
-
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full  space-y-4">
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full space-y-4 grid grid-cols-12 gap-x-4">
+                <div className="col-span-4 space-y-4">
                     <FormField
                         control={form.control}
                         name="title"
@@ -88,7 +85,7 @@ export default function OnboardingForm({ onboarding }: OnboardingFormProps) {
                             <FormItem>
                                 <FormLabel>Title</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Enter onboarding title" {...field} />
+                                    <Input {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -101,20 +98,22 @@ export default function OnboardingForm({ onboarding }: OnboardingFormProps) {
                             <FormItem>
                                 <FormLabel>Description</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Enter onboarding description" {...field} />
+                                    <Textarea {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
+                </div>
 
+                <div className="col-span-12">
                     <StepEditor steps={steps} setSteps={setSteps} />
+                </div>
 
-                    <Button type="submit" className="w-full">
-                        {onboarding ? "Update Onboarding" : "Create Onboarding"}
-                    </Button>
-                </form>
-            </Form>
-        </div>
+                <Button type="submit" className="w-full col-span-12" disabled={createOnboarding.isPending || updateOnboarding.isPending}>
+                    {onboarding ? "Save" : "Create"}
+                </Button>
+            </form>
+        </Form>
     );
 }
